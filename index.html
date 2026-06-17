@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEMPLE — UNDERGROUND</title>
+<meta name="description" content="Ein Tempel für Musik. Folktronica bis Goa, Mittelalter bis Satire. Underground.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================= TOKENS */
+:root{
+  --bg:#000;
+  --fg:#fff;
+  --accent:#c6ff00;        /* Säuregrün — Now Playing / aktiv. Hier ändern: Blutrot #ff2b1d, Amber #ffb000 */
+  --accent-ink:#000;       /* Textfarbe AUF dem Akzent */
+  --muted:#7a7a7a;
+  --muted-2:#4a4a4a;
+  --line:#1c1c1c;          /* Hairlines */
+  --line-2:#2a2a2a;
+  --bar-h:74px;            /* Höhe der Player-Bar */
+  --maxw:1240px;
+  font-synthesis:none;
+  -webkit-text-size-adjust:100%;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg)}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Space Grotesk",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+}
+::selection{background:var(--accent);color:var(--accent-ink)}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.mono{font-family:"Space Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ============================================================= TOP BAR */
+.top{
+  position:sticky;top:0;z-index:40;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+}
+.top__row{display:flex;align-items:center;gap:18px;height:56px}
+.brand{
+  font-weight:700;letter-spacing:.28em;font-size:13px;text-transform:uppercase;
+  white-space:nowrap;
+}
+.brand b{color:var(--accent)}
+.top__spacer{flex:1}
+.search{
+  display:flex;align-items:center;gap:10px;flex:1;max-width:520px;
+  border:1px solid var(--line-2);padding:8px 12px;
+}
+.search:focus-within{border-color:var(--fg)}
+.search svg{width:15px;height:15px;flex:none;color:var(--muted)}
+.search input{
+  flex:1;background:none;border:none;color:var(--fg);
+  font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.02em;
+}
+.search input::placeholder{color:var(--muted-2)}
+.search input:focus{outline:none}
+.adminbtn{
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--muted);border:1px solid var(--line-2);
+  padding:8px 12px;white-space:nowrap;transition:color .15s,border-color .15s;
+}
+.adminbtn:hover{color:var(--fg);border-color:var(--fg)}
+
+/* ============================================================= HERO */
+.hero{border-bottom:1px solid var(--line);padding:clamp(48px,11vw,140px) 0 clamp(36px,7vw,80px)}
+.hero h1{
+  font-weight:700;text-transform:uppercase;letter-spacing:-.02em;line-height:.9;
+  font-size:clamp(64px,18vw,260px);
+}
+.hero h1 .dot{color:var(--accent)}
+.hero__sub{
+  display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.04em;color:var(--muted);
+  text-transform:uppercase;
+}
+.hero__sub span::before{content:"// "}
+.hero__meta{
+  margin-top:34px;display:flex;gap:28px;flex-wrap:wrap;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--muted-2);
+  text-transform:uppercase;
+}
+.hero__meta b{color:var(--fg)}
+
+/* ============================================================= GENRE NAV (anchors) */
+.gnav{
+  position:sticky;top:56px;z-index:30;background:var(--bg);
+  border-bottom:1px solid var(--line);
+}
+.gnav__row{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.gnav__row::-webkit-scrollbar{display:none}
+.gnav a{
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:13px 16px;white-space:nowrap;border-right:1px solid var(--line);
+  transition:color .15s,background .15s;
+}
+.gnav a:first-child{padding-left:0}
+.gnav a:hover{color:var(--fg)}
+.gnav a .c{color:var(--muted-2)}
+
+/* ============================================================= GENRE SECTIONS */
+.section{border-bottom:1px solid var(--line);scroll-margin-top:108px}
+.section__head{
+  display:flex;align-items:baseline;gap:16px;padding:34px 0 14px;
+}
+.section__head h2{
+  font-weight:700;text-transform:uppercase;letter-spacing:-.01em;
+  font-size:clamp(26px,5vw,46px);line-height:1;
+}
+.section__count{
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);
+}
+.section__line{flex:1;height:1px;background:var(--line-2);align-self:center;min-width:24px}
+
+/* track rows */
+.tracks{padding-bottom:26px}
+.row{
+  display:grid;
+  grid-template-columns:42px 1fr 36px;
+  align-items:center;gap:14px;
+  padding:12px 10px;margin:0 -10px;
+  border-top:1px solid var(--line);
+  cursor:pointer;position:relative;
+  transition:background .12s;
+}
+.row:hover{background:#0c0c0c}
+.row__idx{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted-2)}
+.row__main{min-width:0}
+.row__title{
+  font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.row__artist{
+  font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);
+  letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;
+}
+.row__tag{
+  font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted-2);justify-self:end;
+}
+.row[data-kind="playlist"] .row__tag{color:var(--accent)}
+.row__eq{display:none;justify-self:start;width:14px;height:14px}
+.row.is-active{background:#0c0c0c}
+.row.is-active .row__title{color:var(--accent)}
+.row.is-active .row__idx{display:none}
+.row.is-active .row__eq{display:block}
+.row.is-active::before{content:"";position:absolute;left:-10px;top:0;bottom:0;width:3px;background:var(--accent)}
+.eq span{fill:var(--accent)}
+.eq rect{fill:var(--accent);transform-origin:bottom}
+.playing .eq rect:nth-child(1){animation:eq .9s -.1s steps(1,end) infinite alternate}
+.playing .eq rect:nth-child(2){animation:eq .7s -.4s steps(1,end) infinite alternate}
+.playing .eq rect:nth-child(3){animation:eq .8s -.2s steps(1,end) infinite alternate}
+@keyframes eq{0%{transform:scaleY(.2)}100%{transform:scaleY(1)}}
+
+.empty{
+  font-family:"Space Mono",monospace;font-size:12px;color:var(--muted-2);
+  padding:18px 0 8px;letter-spacing:.05em;
+}
+.empty b{color:var(--muted)}
+
+/* ============================================================= FOOTER */
+.foot{padding:46px 0 60px;color:var(--muted-2)}
+.foot__row{
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+}
+.foot a:hover{color:var(--fg)}
+
+/* ============================================================= PLAYER BAR */
+.player{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  height:calc(var(--bar-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom);
+  background:var(--bg);border-top:1px solid var(--fg);
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
+  padding-left:20px;padding-right:20px;
+}
+.player.is-empty{grid-template-columns:1fr}
+.player.is-empty .pl__now,.player.is-empty .pl__right{display:none}
+.player.is-empty::after{
+  content:"// KEIN TRACK GEWÄHLT — WÄHLE OBEN AUS DEM INDEX";
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--muted-2);
+}
+.pl__now{display:flex;align-items:center;gap:14px;min-width:0}
+.pl__badge{
+  font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent-ink);background:var(--accent);padding:4px 7px;white-space:nowrap;flex:none;
+}
+.pl__txt{min-width:0;overflow:hidden}
+.pl__title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl__artist{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.04em}
+.pl__ctrls{display:flex;align-items:center;gap:6px}
+.pl__btn{
+  width:38px;height:38px;display:grid;place-items:center;color:var(--fg);
+  border:1px solid transparent;transition:color .12s,border-color .12s;
+}
+.pl__btn:hover{color:var(--accent)}
+.pl__btn svg{width:18px;height:18px}
+.pl__btn--play{width:46px;height:46px;border:1px solid var(--fg)}
+.pl__btn--play:hover{border-color:var(--accent)}
+.pl__btn--play svg{width:20px;height:20px}
+.pl__btn.is-on{color:var(--accent)}
+.pl__right{display:flex;align-items:center;gap:14px;justify-content:flex-end;min-width:0}
+.pl__time{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+.pl__time b{color:var(--fg);font-weight:400}
+.seek{
+  --p:0%;flex:1;max-width:280px;height:18px;display:flex;align-items:center;cursor:pointer;position:relative;
+}
+.seek__track{height:3px;width:100%;background:var(--line-2);position:relative}
+.seek__fill{position:absolute;left:0;top:0;bottom:0;width:var(--p);background:var(--accent)}
+.seek input{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;
+}
+.pl__vid{
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted-2);border:1px solid var(--line-2);padding:6px 8px;white-space:nowrap;
+}
+.pl__vid:hover{color:var(--fg);border-color:var(--fg)}
+.pl__vid.is-on{color:var(--accent);border-color:var(--accent)}
+
+/* hidden / shown youtube player */
+#ytwrap{
+  position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;z-index:-1;
+}
+#ytwrap.show{
+  left:auto;right:14px;bottom:calc(var(--bar-h) + 14px + env(safe-area-inset-bottom));
+  width:280px;height:158px;opacity:1;pointer-events:auto;z-index:60;
+  border:1px solid var(--fg);background:#000;
+}
+
+/* ============================================================= ADMIN */
+.admin{
+  position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.86);
+  display:none;overflow-y:auto;
+  backdrop-filter:blur(2px);
+}
+.admin.open{display:block}
+.admin__panel{
+  max-width:880px;margin:0 auto;min-height:100%;
+  background:var(--bg);border-left:1px solid var(--line);border-right:1px solid var(--line);
+  padding:0 28px 60px;
+}
+.admin__top{
+  position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--fg);
+  display:flex;align-items:center;gap:16px;padding:18px 0;margin-bottom:26px;z-index:2;
+}
+.admin__top h2{font-size:18px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.admin__top h2 b{color:var(--accent)}
+.admin__close{margin-left:auto;font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);border:1px solid var(--line-2);padding:8px 12px;text-transform:uppercase;letter-spacing:.1em}
+.admin__close:hover{color:var(--fg);border-color:var(--fg)}
+
+.fld{margin-bottom:22px}
+.fld__lab{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block}
+.fld textarea,.fld input{
+  width:100%;background:#0a0a0a;border:1px solid var(--line-2);color:var(--fg);
+  font-family:"Space Mono",monospace;font-size:13px;padding:12px;line-height:1.6;
+}
+.fld textarea{min-height:96px;resize:vertical}
+.fld textarea:focus,.fld input:focus{outline:none;border-color:var(--fg)}
+.row2{display:flex;gap:12px;flex-wrap:wrap}
+.row2>*{flex:1;min-width:180px}
+
+.btn{
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  padding:13px 18px;border:1px solid var(--fg);color:var(--fg);transition:.12s;white-space:nowrap;
+}
+.btn:hover{background:var(--fg);color:var(--bg)}
+.btn--accent{border-color:var(--accent);color:var(--accent)}
+.btn--accent:hover{background:var(--accent);color:var(--accent-ink)}
+.btn--ghost{border-color:var(--line-2);color:var(--muted)}
+.btn--ghost:hover{background:none;color:var(--fg);border-color:var(--fg)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.note{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted-2);line-height:1.7;letter-spacing:.02em;margin-top:8px}
+.note b{color:var(--muted)}
+
+.stat{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.04em;margin:14px 0;min-height:18px}
+.stat.ok{color:var(--accent)}
+.stat.err{color:#ff4d3d}
+.stat.work{color:var(--muted)}
+
+/* staging list */
+.stage{margin-top:24px;border-top:1px solid var(--line)}
+.stage__row{
+  display:grid;grid-template-columns:1fr 200px 30px;gap:12px;align-items:center;
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.stage__title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage__sub{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage select{
+  width:100%;background:#0a0a0a;border:1px solid var(--line-2);color:var(--fg);
+  font-family:"Space Mono",monospace;font-size:11px;padding:8px;text-transform:uppercase;letter-spacing:.05em;
+}
+.stage select:focus{outline:none;border-color:var(--fg)}
+.stage__del{color:var(--muted-2);font-size:18px;justify-self:center}
+.stage__del:hover{color:#ff4d3d}
+.stage__new{font-family:"Space Mono",monospace;font-size:10px;color:var(--accent);margin-top:2px;letter-spacing:.06em}
+
+.admin__sub{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line-2);padding-bottom:8px;margin:34px 0 16px}
+
+/* manage genres */
+.gman{display:flex;flex-wrap:wrap;gap:8px}
+.gman__chip{
+  display:flex;align-items:center;gap:8px;border:1px solid var(--line-2);padding:7px 10px;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.04em;
+}
+.gman__chip b{color:var(--muted)}
+.gman__chip button{color:var(--muted-2);font-size:13px}
+.gman__chip button:hover{color:#ff4d3d}
+
+@media (max-width:680px){
+  .top__row{flex-wrap:wrap;height:auto;padding:10px 0;gap:10px}
+  .search{order:3;max-width:none;flex-basis:100%}
+  .stage__row{grid-template-columns:1fr 140px 28px}
+  .pl__right .pl__vid{display:none}
+  .seek{max-width:140px}
+  #ytwrap.show{width:200px;height:113px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="top">
+  <div class="wrap top__row">
+    <div class="brand">TEM<b>·</b>PLE</div>
+    <div class="search" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search" type="search" placeholder="suche / filter — titel, künstler, genre…" aria-label="Musik durchsuchen" autocomplete="off">
+    </div>
+    <div class="top__spacer"></div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <h1>TEMPLE<span class="dot">.</span></h1>
+    <div class="hero__sub">
+      <span>Folktronica</span><span>Downtempo</span><span>Psychedelic</span><span>Goa</span>
+      <span>Trance</span><span>Hardcore</span><span>Mittelalter</span><span>Ambient</span>
+      <span>Rock</span><span>Melancholie</span><span>Satire</span>
+    </div>
+    <div class="hero__meta">
+      <span><b id="m-tracks">0</b> Tracks</span>
+      <span><b id="m-genres">0</b> Genres</span>
+      <span>Audio-first · YouTube</span>
+      <span>Underground</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GENRE ANCHORS ============ -->
+<nav class="gnav" aria-label="Genres">
+  <div class="wrap"><div class="gnav__row" id="gnav"></div></div>
+</nav>
+
+<!-- ============ INDEX ============ -->
+<main class="wrap" id="index"></main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <div class="wrap foot__row">
+    <span>TEMPLE — UNDERGROUND ARCHIVE</span>
+    <span>KEIN UPLOAD · NUR LINKS · NUR YOUTUBE-EMBEDS · <span id="year"></span></span>
+  </div>
+</footer>
+
+<!-- ============ PLAYER BAR ============ -->
+<div class="player is-empty" id="player" role="region" aria-label="Player">
+  <div class="pl__now">
+    <span class="pl__badge" id="pl-genre">—</span>
+    <div class="pl__txt">
+      <div class="pl__title" id="pl-title">—</div>
+      <div class="pl__artist" id="pl-artist">—</div>
+    </div>
+  </div>
+  <div class="pl__ctrls">
+    <button class="pl__btn" id="btn-shuffle" aria-label="Zufall" title="Zufall">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/><path d="M16 21h5v-5"/><path d="M3 3l5.5 5.5"/></svg>
+    </button>
+    <button class="pl__btn" id="btn-prev" aria-label="Zurück">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5L9 12l11 7z"/></svg>
+    </button>
+    <button class="pl__btn pl__btn--play" id="btn-play" aria-label="Abspielen">
+      <svg id="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>
+      <svg id="ic-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+    </button>
+    <button class="pl__btn" id="btn-next" aria-label="Weiter">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg>
+    </button>
+    <button class="pl__btn" id="btn-repeat" aria-label="Wiederholen" title="Wiederholen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    </button>
+  </div>
+  <div class="pl__right">
+    <span class="pl__time mono"><b id="t-cur">0:00</b> / <span id="t-dur">0:00</span></span>
+    <div class="seek" id="seek">
+      <div class="seek__track"><div class="seek__fill" id="seek-fill"></div></div>
+      <input type="range" id="seek-input" min="0" max="1000" value="0" aria-label="Position">
+    </div>
+    <button class="pl__vid" id="btn-video" title="YouTube-Video ein-/ausblenden">Video</button>
+  </div>
+</div>
+
+<div id="ytwrap"><div id="ytplayer"></div></div>
+
+<!-- ============ ADMIN HUB ============ -->
+<div class="admin" id="admin" role="dialog" aria-modal="true" aria-label="Admin Hub">
+  <div class="admin__panel">
+    <div class="admin__top">
+      <h2>THE <b>HUB</b></h2>
+      <button class="admin__close" id="close-admin">Schliessen [ESC]</button>
+    </div>
+
+    <div class="fld">
+      <label class="fld__lab" for="links">YouTube-Links einwerfen — Video oder Playlist, einer pro Zeile</label>
+      <textarea id="links" placeholder="https://www.youtube.com/watch?v=…
+https://youtu.be/…
+https://music.youtube.com/watch?v=…
+https://www.youtube.com/playlist?list=…"></textarea>
+      <div class="btnrow" style="margin-top:12px">
+        <button class="btn btn--accent" id="btn-fetch">↳ Einlesen &amp; Sortieren</button>
+        <span class="stat work" id="fetch-stat"></span>
+      </div>
+      <div class="note">Titel &amp; Kanal werden automatisch von YouTube geladen (oEmbed, kein API-Key). Das Genre wird aus Titel + Kanal geraten — <b>du kannst es unten pro Track ändern</b>.</div>
+    </div>
+
+    <!-- staging -->
+    <div id="stage-block" style="display:none">
+      <div class="admin__sub">Warteschlange — prüfen, Genre korrigieren</div>
+      <div class="stage" id="stage"></div>
+    </div>
+
+    <!-- publish -->
+    <div class="admin__sub">Veröffentlichen</div>
+    <div class="fld">
+      <label class="fld__lab" for="pw">Admin-Passwort</label>
+      <input id="pw" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="btnrow">
+      <button class="btn btn--accent" id="btn-publish">▲ Publish → Live</button>
+      <button class="btn btn--ghost" id="btn-export">Export JSON</button>
+      <button class="btn btn--ghost" id="btn-clearstage">Warteschlange leeren</button>
+      <span class="stat" id="pub-stat"></span>
+    </div>
+    <div class="note">
+      <b>Publish</b> schreibt die komplette Bibliothek über die Serverless-Funktion in dein GitHub-Repo → Vercel deployt neu → für alle live.<br>
+      <b>Hinweis Sicherheit:</b> Dieses Panel ist nur clientseitig versteckt (kosmetisch). Der echte Schutz sitzt serverseitig — ohne korrektes Passwort wird nichts veröffentlicht.<br>
+      <b>Lokal / ohne Deploy:</b> „Export JSON" lädt die Datei herunter; du kannst sie auch von Hand in GitHub ersetzen.
+    </div>
+
+    <!-- manage genres -->
+    <div class="admin__sub">Genre-Gruppen</div>
+    <div class="gman" id="gman"></div>
+    <div class="btnrow" style="margin-top:14px">
+      <input id="newg" class="mono" style="flex:1;min-width:200px;background:#0a0a0a;border:1px solid var(--line-2);color:var(--fg);font-family:'Space Mono',monospace;font-size:12px;padding:11px" placeholder="neues Genre anlegen…">
+      <button class="btn btn--ghost" id="btn-addg">+ Anlegen</button>
+    </div>
+    <div class="note">Leere Gruppen werden im Tempel nur als Platzhalter angezeigt. Beim Umbenennen werden alle Tracks mitgenommen.</div>
+  </div>
+</div>
+
+<script>
+/* ====================================================================
+   TEMPLE — vanilla app
+   ==================================================================== */
+(function(){
+"use strict";
+
+/* ====== GEHEIMER HUB-ZUGANG ======================================
+   Der Admin-Hub öffnet NUR unter   deine-seite.de/#<ADMIN_KEY>
+   Es gibt keinen sichtbaren Button. Ändere den Wert in deinen eigenen
+   langen, zufälligen String (nicht erraten lassen).
+   Merke dir die URL / setze ein Lesezeichen.
+   Hinweis: Das ist nur das Verstecken der Oberfläche — der ECHTE Schutz
+   ist das serverseitige Passwort + Rate-Limit in /api/publish. */
+const ADMIN_KEY = "hub-x7q2-9fk3-zm8w";
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const esc = s => (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "x";
+const fmt = t => { t=Math.max(0,Math.floor(t||0)); const m=Math.floor(t/60), s=t%60; return m+":"+String(s).padStart(2,"0"); };
+
+/* ---------- genre classifier (heuristik, kein API-key) ---------- */
+/* Reihenfolge = Priorität bei Gleichstand. Stichwörter frei erweiterbar. */
+const RULES = [
+  ["Satire / Liedermacher", ["soellner","sollner","hans zollner","hans sollner","hannes wader","hannes warder","fritz widmann","widmann","liedermacher","kabarett","satire","funny van dannen","rainald grebe"]],
+  ["Mittelalter",           ["mittelalter","medieval","dudelsack","spielmann","tanzwut","mittelalterrock","minnesang","in extremo","saltatio","schelmish","feuertanz","versengold"]],
+  ["Goa / Psy",             ["goa","psytrance","psy-trance","psy trance","psychedelic trance","fullon","full-on","full on","darkpsy","forest psy","hi-tech","hitech","suomi","progressive psy","psychedelic"]],
+  ["Trance",                ["uplifting trance","progressive trance","prog trance"," trance","euphoric"]],
+  ["Hardcore",              ["hardcore","gabber","frenchcore","uptempo","hardtek","tekno","hardstyle","terror","mainstream hardcore"]],
+  ["Downtempo",             ["downtempo","chillout","chill out","chillgressive","trip-hop","trip hop","triphop","psybient","psydub","dub techno"]],
+  ["Folktronica",           ["folktronica","folktronic","folk electronica","neofolk","nu-folk"]],
+  ["Ambient",               ["ambient","drone","soundscape","atmospheric","field recording"]],
+  ["Melancholie",           ["melancholic","melancholy","melancholie","traurig","darkwave","dark wave","coldwave","sadcore","wave"]],
+  ["Rock",                  ["rock","metal","punk","grunge","hardrock","stoner","postrock","post-rock"]],
+];
+function classify(title, channel){
+  const hay = " " + norm(title + " " + (channel||"")) + " ";
+  let best = null, bestScore = 0;
+  for (const [genre, kws] of RULES){
+    let score = 0;
+    for (const kw of kws){ if (hay.indexOf(norm(kw)) !== -1) score += kw.length > 4 ? 2 : 1; }
+    if (score > bestScore){ bestScore = score; best = genre; }
+  }
+  return best || "Unsortiert";
+}
+
+/* ---------- youtube url parsing ---------- */
+function parseYT(url){
+  url = (url||"").trim();
+  if (!url) return null;
+  // plain id
+  if (/^[A-Za-z0-9_-]{11}$/.test(url)) return {kind:"video", id:url};
+  let m;
+  try {
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    const u = new URL(url);
+    const list = u.searchParams.get("list");
+    const v = u.searchParams.get("v");
+    // echte Playlist (PL/FL/OL/UU/LL) hat Vorrang → wird in Einzeltracks zerlegt.
+    // RD…-Mixe sind keine echten Playlists → als Einzelvideo behandeln.
+    const realList = list && /^(PL|FL|OL|UU|LL)/.test(list);
+    if (realList) return {kind:"playlist", id:list};
+    if (v) return {kind:"video", id:v};
+    if (/youtu\.be$/i.test(u.hostname)){
+      const id = u.pathname.slice(1).split("/")[0];
+      if (id) return {kind:"video", id};
+    }
+    m = u.pathname.match(/\/(?:embed|shorts|v)\/([A-Za-z0-9_-]{6,})/);
+    if (m) return {kind:"video", id:m[1]};
+    if (list) return {kind:"playlist", id:list};
+  } catch(e){}
+  return null;
+}
+async function fetchMeta(url){
+  try{
+    const r = await fetch("https://www.youtube.com/oembed?format=json&url=" + encodeURIComponent(url));
+    if (!r.ok) return null;
+    const j = await r.json();
+    return { title:j.title || "", author:(j.author_name||"").replace(/\s*-\s*Topic$/,"") };
+  }catch(e){ return null; }
+}
+
+/* ====================================================================
+   STATE
+   ==================================================================== */
+const LS_KEY = "temple_library_v1";
+const SEED_GENRES = ["Folktronica","Downtempo","Psychedelic","Goa / Psy","Trance","Hardcore","Mittelalter","Ambient","Rock","Melancholie","Satire / Liedermacher","Unsortiert"];
+
+let LIB = { version:1, updated:null, genres:[] };  // working copy
+let FLAT = [];          // flattened, filtered playable list (current view order)
+let curId = null;       // currently playing entry uid
+let isPlaying = false;
+let shuffle = false, repeat = false;
+let ytApiReady = false, ytReady = false, player = null, pendingPlay = null, ticker = null;
+
+function uid(t){ return (t.kind||"v")+":"+t.id; }
+
+function ensureGenre(name){
+  let g = LIB.genres.find(x=>x.name===name);
+  if (!g){ g = {name, tracks:[]}; LIB.genres.push(g); }
+  return g;
+}
+function genreNames(){ return LIB.genres.map(g=>g.name); }
+
+/* ---------- load ---------- */
+async function loadLibrary(){
+  let base = null;
+  try{
+    const r = await fetch("playlists.json", {cache:"no-store"});
+    if (r.ok) base = await r.json();
+  }catch(e){}
+  if (!base || !Array.isArray(base.genres)){
+    base = { version:1, genres: SEED_GENRES.map(n=>({name:n,tracks:[]})) };
+  }
+  // merge local staging on top (admin unpublished edits)
+  let local = null;
+  try{ local = JSON.parse(localStorage.getItem(LS_KEY)||"null"); }catch(e){}
+  LIB = (local && Array.isArray(local.genres)) ? local : base;
+  // make sure seed groups exist for a non-empty index
+  SEED_GENRES.forEach(ensureGenre);
+}
+function saveLocal(){
+  LIB.updated = new Date().toISOString();
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(LIB)); }catch(e){}
+}
+
+/* ====================================================================
+   RENDER — the temple index
+   ==================================================================== */
+function render(){
+  const q = norm($("#search").value);
+  const idx = $("#index");
+  const gnav = $("#gnav");
+  idx.innerHTML = "";
+  gnav.innerHTML = "";
+  FLAT = [];
+  let total = 0, shownGenres = 0;
+
+  LIB.genres.forEach(g=>{
+    const matches = g.tracks.filter(t=>{
+      if (!q) return true;
+      return norm(t.title).includes(q) || norm(t.artist).includes(q) || norm(g.name).includes(q);
+    });
+    total += g.tracks.length;
+    // hide a genre entirely only when searching and it has no match
+    if (q && matches.length===0) return;
+
+    const id = "g-"+slug(g.name);
+    shownGenres++;
+
+    const a = document.createElement("a");
+    a.href = "#"+id;
+    a.innerHTML = esc(g.name) + ' <span class="c">'+g.tracks.length+'</span>';
+    gnav.appendChild(a);
+
+    const sec = document.createElement("section");
+    sec.className = "section";
+    sec.id = id;
+    let rows = "";
+    matches.forEach((t)=>{
+      const u = uid(t);
+      FLAT.push({t, genre:g.name});
+      const n = String(FLAT.length).padStart(2,"0");
+      rows += `<div class="row${curId===u?' is-active':''}${curId===u&&isPlaying?' playing':''}" data-uid="${esc(u)}" data-kind="${t.kind||'video'}" role="button" tabindex="0" aria-label="Abspielen: ${esc(t.title)}">
+        <span class="row__idx">${n}</span>
+        <svg class="row__eq eq" viewBox="0 0 14 14" aria-hidden="true"><rect x="1" y="3" width="3" height="11"/><rect x="5.5" y="3" width="3" height="11"/><rect x="10" y="3" width="3" height="11"/></svg>
+        <div class="row__main">
+          <div class="row__title">${esc(t.title||t.id)}</div>
+          <div class="row__artist">${esc(t.artist||"—")}</div>
+        </div>
+        <span class="row__tag">${(t.kind==='playlist')?'PLAYLIST':''}</span>
+      </div>`;
+    });
+    if (!rows){
+      rows = `<div class="empty">// LEER — <b>im Hub befüllen</b></div>`;
+    }
+    sec.innerHTML = `<div class="section__head">
+        <h2>${esc(g.name)}</h2>
+        <span class="section__line"></span>
+        <span class="section__count">${matches.length} / ${g.tracks.length}</span>
+      </div><div class="tracks">${rows}</div>`;
+    idx.appendChild(sec);
+  });
+
+  if (shownGenres===0){
+    idx.innerHTML = `<section class="section"><div class="empty" style="padding:60px 0">// KEIN TREFFER für „${esc($("#search").value)}"</div></section>`;
+  }
+  $("#m-tracks").textContent = total;
+  $("#m-genres").textContent = LIB.genres.filter(g=>g.tracks.length).length;
+}
+
+/* ====================================================================
+   PLAYER
+   ==================================================================== */
+window.onYouTubeIframeAPIReady = function(){ apiReady(); };
+function apiReady(){
+  if (ytApiReady) return;
+  ytApiReady = true;
+  if (pendingPlay){ const p = pendingPlay; pendingPlay = null; startPlay(p); }
+}
+function loadYTApi(){
+  if (window.YT && window.YT.Player){ apiReady(); return; }   // API schon vorhanden (Cache/bfcache)
+  const s = document.createElement("script");
+  s.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(s);
+}
+
+function findEntry(u){ return FLAT.find(e=>uid(e.t)===u) || null; }
+function playUid(u){ const e = findEntry(u); if (e) startPlay(e); }
+
+// Player wird LAZY beim ersten Play erzeugt — mit konkreter Video-/Playlist-ID,
+// sonst baut die YT-API kein iframe.
+function buildPlayer(e){
+  const opts = {
+    height:"158", width:"280",
+    playerVars:{ autoplay:1, controls:1, modestbranding:1, rel:0, playsinline:1 },
+    events:{
+      onReady:()=>{ ytReady=true; if(pendingPlay){ const p=pendingPlay; pendingPlay=null; startPlay(p); } startTicker(); },
+      onStateChange:onState
+    }
+  };
+  if (e.t.kind === "playlist"){ opts.playerVars.listType="playlist"; opts.playerVars.list=e.t.id; }
+  else { opts.videoId = e.t.id; }
+  player = new YT.Player("ytplayer", opts);
+}
+function startPlay(e){
+  curId = uid(e.t);
+  isPlaying = true;
+  updateBar(e);
+  if (!ytApiReady){ pendingPlay = e; render(); return; }   // API lädt noch
+  if (!player){ buildPlayer(e); render(); return; }         // erster Play überhaupt
+  if (!ytReady){ pendingPlay = e; render(); return; }       // Player konstruiert noch
+  if (e.t.kind === "playlist"){
+    player.loadPlaylist({ list:e.t.id, listType:"playlist", index:0 });
+  } else {
+    player.loadVideoById(e.t.id);
+  }
+  render();
+  startTicker();
+}
+function onState(ev){
+  // 1 playing, 2 paused, 0 ended
+  if (ev.data === YT.PlayerState.PLAYING){ isPlaying=true; reflectPlay(); startTicker(); }
+  else if (ev.data === YT.PlayerState.PAUSED){ isPlaying=false; reflectPlay(); }
+  else if (ev.data === YT.PlayerState.ENDED){ isPlaying=false; reflectPlay(); next(); }
+}
+function reflectPlay(){
+  $("#ic-play").style.display = isPlaying ? "none":"block";
+  $("#ic-pause").style.display = isPlaying ? "block":"none";
+  $("#btn-play").setAttribute("aria-label", isPlaying?"Pause":"Abspielen");
+  $$(".row.is-active").forEach(r=> r.classList.toggle("playing", isPlaying));
+}
+function togglePlay(){
+  if (!curId){ if (FLAT.length) playUid(uid(FLAT[0].t)); return; }
+  if (!player || !ytReady) return;
+  const st = player.getPlayerState();
+  if (st === YT.PlayerState.PLAYING) player.pauseVideo();
+  else player.playVideo();
+}
+function curIndex(){ return FLAT.findIndex(e=>uid(e.t)===curId); }
+function next(){
+  if (!FLAT.length) return;
+  if (repeat && curId){ playUid(curId); return; }
+  let i = curIndex();
+  if (shuffle){ i = Math.floor(Math.random()*FLAT.length); }
+  else { i = (i+1) % FLAT.length; }
+  playUid(uid(FLAT[i].t));
+}
+function prev(){
+  if (!FLAT.length) return;
+  if (ytReady && player && player.getCurrentTime() > 3){ player.seekTo(0); return; }
+  let i = curIndex();
+  i = (i - 1 + FLAT.length) % FLAT.length;
+  playUid(uid(FLAT[i].t));
+}
+function updateBar(e){
+  $("#player").classList.remove("is-empty");
+  $("#pl-genre").textContent = e.genre || "—";
+  $("#pl-title").textContent = e.t.title || e.t.id;
+  $("#pl-artist").textContent = e.t.artist || "—";
+  reflectPlay();
+}
+function startTicker(){
+  clearInterval(ticker);
+  ticker = setInterval(()=>{
+    if (!player || !player.getDuration) return;
+    const d = player.getDuration() || 0;
+    const c = player.getCurrentTime() || 0;
+    $("#t-cur").textContent = fmt(c);
+    $("#t-dur").textContent = fmt(d);
+    const p = d ? (c/d) : 0;
+    $("#seek-fill").style.width = (p*100)+"%";
+    const si = $("#seek-input");
+    if (document.activeElement !== si) si.value = Math.round(p*1000);
+  }, 250);
+}
+
+/* ====================================================================
+   ADMIN HUB
+   ==================================================================== */
+let STAGE = [];   // {id,kind,title,artist,genre,isNewGenre}
+
+function openAdmin(){ $("#admin").classList.add("open"); $("#links").focus(); renderGman(); }
+function closeAdmin(){ $("#admin").classList.remove("open"); if(location.hash) history.replaceState(null,"",location.pathname+location.search); }
+
+// Playlist serverseitig in Einzeltracks auflösen (braucht /api/playlist + YOUTUBE_API_KEY)
+async function expandPlaylist(listId){
+  const r = await fetch("/api/playlist?list="+encodeURIComponent(listId));
+  const j = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(j.error || ("HTTP "+r.status));
+  return j.tracks || [];
+}
+function stageAdd(id, title, author){
+  if (STAGE.some(s=>s.id===id && s.kind==="video")) return false;
+  STAGE.push({ id, kind:"video", title:title||id, artist:author||"", genre:classify(title||"", author||"") });
+  return true;
+}
+
+async function ingest(){
+  const raw = $("#links").value.split(/[\n\r]+/).map(s=>s.trim()).filter(Boolean);
+  if (!raw.length){ setStat("#fetch-stat","Keine Links.","err"); return; }
+  let added=0, skipped=0, dupes=0, lastErr="";
+  for (let i=0;i<raw.length;i++){
+    const line = raw[i];
+    const p = parseYT(line);
+    if (!p){ skipped++; continue; }
+
+    if (p.kind === "playlist"){
+      // ganze Playlist → lauter Einzeltracks
+      setStat("#fetch-stat","Playlist wird ausgelesen…","work");
+      let tracks=[];
+      try { tracks = await expandPlaylist(p.id); }
+      catch(e){ lastErr = "Playlist konnte nicht gelesen werden ("+e.message+")"; continue; }
+      let n=0;
+      tracks.forEach(t=>{ if (stageAdd(t.id, t.title, t.author)){ n++; added++; } else dupes++; });
+      renderStage();
+      setStat("#fetch-stat","Playlist: "+n+" Track(s) eingelesen…","work");
+    } else {
+      // einzelnes Video → Titel via oEmbed
+      setStat("#fetch-stat","Lese Video "+(i+1)+"/"+raw.length+"…","work");
+      if (STAGE.some(s=>s.id===p.id && s.kind==="video")){ dupes++; continue; }
+      const meta = await fetchMeta(line) || {title:"", author:""};
+      if (stageAdd(p.id, meta.title || p.id, meta.author)) added++; else dupes++;
+    }
+  }
+  $("#links").value="";
+  renderStage();
+  // Fehler nicht verschlucken: wenn nichts kam und es einen Fehler gab, ihn zeigen
+  if (!added && lastErr){ setStat("#fetch-stat","✗ "+lastErr,"err"); return; }
+  setStat("#fetch-stat",
+    added+" Track(s) übernommen"+(dupes?", "+dupes+" Duplikat(e)":"")+(skipped?", "+skipped+" ungültig":"")+(lastErr?" · 1 Playlist-Fehler":""),
+    added?"ok":"err");
+}
+
+function renderStage(){
+  const block = $("#stage-block"), wrap = $("#stage");
+  if (!STAGE.length){ block.style.display="none"; wrap.innerHTML=""; return; }
+  block.style.display="block";
+  const opts = genreNames();
+  wrap.innerHTML = STAGE.map((s,i)=>{
+    const isNew = !opts.includes(s.genre);
+    const optionsHtml = opts.map(o=>`<option ${o===s.genre?"selected":""}>${esc(o)}</option>`).join("")
+      + (isNew?`<option selected>${esc(s.genre)}</option>`:"");
+    return `<div class="stage__row">
+      <div style="min-width:0">
+        <div class="stage__title">${esc(s.title)} ${s.kind==='playlist'?'<span style="color:var(--accent)">[PLAYLIST]</span>':''}</div>
+        <div class="stage__sub">${esc(s.artist||"—")} · ${esc(s.id)}</div>
+        ${isNew?'<div class="stage__new">+ neues Genre</div>':''}
+      </div>
+      <select data-i="${i}" aria-label="Genre">${optionsHtml}</select>
+      <button class="stage__del" data-del="${i}" aria-label="Entfernen">×</button>
+    </div>`;
+  }).join("");
+  wrap.querySelectorAll("select").forEach(sel=>{
+    sel.onchange = e=>{ STAGE[+e.target.dataset.i].genre = e.target.value; renderStage(); };
+  });
+  wrap.querySelectorAll("[data-del]").forEach(b=>{
+    b.onclick = e=>{ STAGE.splice(+e.currentTarget.dataset.del,1); renderStage(); };
+  });
+}
+
+function commitStageToLib(){
+  STAGE.forEach(s=>{
+    const g = ensureGenre(s.genre);
+    if (!g.tracks.some(t=>t.id===s.id && (t.kind||"video")===s.kind)){
+      g.tracks.unshift({ id:s.id, kind:s.kind, title:s.title, artist:s.artist, added:new Date().toISOString() });
+    }
+  });
+  STAGE = [];
+  saveLocal();
+  renderStage();
+  render();
+}
+
+function renderGman(){
+  const g = $("#gman");
+  g.innerHTML = LIB.genres.map((x,i)=>`<div class="gman__chip">
+      <span><b>${esc(x.name)}</b> · ${x.tracks.length}</span>
+      <button data-ren="${i}" title="Umbenennen" aria-label="Umbenennen">✎</button>
+      <button data-delg="${i}" title="Löschen" aria-label="Löschen">×</button>
+    </div>`).join("");
+  g.querySelectorAll("[data-ren]").forEach(b=>b.onclick=e=>{
+    const i=+e.currentTarget.dataset.ren; const nv=prompt("Genre umbenennen:", LIB.genres[i].name);
+    if(nv && nv.trim()){ LIB.genres[i].name=nv.trim(); saveLocal(); renderGman(); render(); }
+  });
+  g.querySelectorAll("[data-delg]").forEach(b=>b.onclick=e=>{
+    const i=+e.currentTarget.dataset.delg; const x=LIB.genres[i];
+    if(x.tracks.length && !confirm('„'+x.name+'" hat '+x.tracks.length+' Track(s). Wirklich löschen?')) return;
+    LIB.genres.splice(i,1); saveLocal(); renderGman(); render();
+  });
+}
+
+function exportJSON(){
+  commitStageToLib();
+  const data = { version:1, updated:new Date().toISOString(), genres: LIB.genres.filter(g=>true) };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "playlists.json"; a.click();
+  URL.revokeObjectURL(a.href);
+  setStat("#pub-stat","playlists.json heruntergeladen.","ok");
+}
+
+async function publish(){
+  commitStageToLib();
+  const pw = $("#pw").value;
+  if (!pw){ setStat("#pub-stat","Passwort fehlt.","err"); return; }
+  setStat("#pub-stat","Veröffentliche…","work");
+  const payload = { password:pw, playlists:{ version:1, updated:new Date().toISOString(), genres:LIB.genres } };
+  try{
+    const r = await fetch("/api/publish", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
+    });
+    const j = await r.json().catch(()=>({}));
+    if (r.ok){ setStat("#pub-stat","✓ Live. Vercel deployt neu (~30 s).","ok"); }
+    else if (r.status===401){ setStat("#pub-stat","✗ Falsches Passwort.","err"); }
+    else { setStat("#pub-stat","✗ "+(j.error||("HTTP "+r.status)),"err"); }
+  }catch(e){
+    setStat("#pub-stat","✗ Kein Backend erreichbar — nutze „Export JSON“ lokal.","err");
+  }
+}
+function setStat(sel,msg,cls){ const el=$(sel); el.textContent=msg; el.className="stat "+(cls||""); }
+
+/* ====================================================================
+   WIRING
+   ==================================================================== */
+function bind(){
+  // search
+  let to;
+  $("#search").addEventListener("input", ()=>{ clearTimeout(to); to=setTimeout(render,120); });
+
+  // delegated row click
+  $("#index").addEventListener("click", e=>{
+    const row = e.target.closest(".row"); if(!row) return;
+    playUid(row.dataset.uid);
+  });
+  $("#index").addEventListener("keydown", e=>{
+    if (e.key!=="Enter" && e.key!==" ") return;
+    const row = e.target.closest(".row"); if(!row) return;
+    e.preventDefault(); playUid(row.dataset.uid);
+  });
+
+  // player controls
+  $("#btn-play").onclick = togglePlay;
+  $("#btn-next").onclick = next;
+  $("#btn-prev").onclick = prev;
+  $("#btn-shuffle").onclick = e=>{ shuffle=!shuffle; e.currentTarget.classList.toggle("is-on",shuffle); };
+  $("#btn-repeat").onclick = e=>{ repeat=!repeat; e.currentTarget.classList.toggle("is-on",repeat); };
+  $("#btn-video").onclick = e=>{ const on=$("#ytwrap").classList.toggle("show"); e.currentTarget.classList.toggle("is-on",on); };
+  // seek
+  $("#seek-input").addEventListener("input", e=>{
+    if(!player||!player.getDuration) return;
+    const d=player.getDuration()||0; const p=e.target.value/1000;
+    $("#seek-fill").style.width=(p*100)+"%";
+    player.seekTo(p*d, true);
+  });
+
+  // admin open/close — Zugang nur über die geheime URL  #<ADMIN_KEY>
+  $("#close-admin").onclick = closeAdmin;
+  window.addEventListener("hashchange", routeHash);
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("#admin").classList.contains("open")) closeAdmin(); });
+  $("#admin").addEventListener("mousedown", e=>{ if(e.target===$("#admin")) closeAdmin(); });
+
+  // admin actions
+  $("#btn-fetch").onclick = ingest;
+  $("#btn-publish").onclick = publish;
+  $("#btn-export").onclick = exportJSON;
+  $("#btn-clearstage").onclick = ()=>{ STAGE=[]; renderStage(); setStat("#fetch-stat","",""); };
+  $("#btn-addg").onclick = ()=>{ const v=$("#newg").value.trim(); if(v){ ensureGenre(v); $("#newg").value=""; saveLocal(); renderGman(); render(); } };
+  $("#newg").addEventListener("keydown",e=>{ if(e.key==="Enter") $("#btn-addg").click(); });
+}
+function routeHash(){ if (location.hash==="#"+ADMIN_KEY) openAdmin(); }
+
+/* ---------- boot ---------- */
+async function boot(){
+  $("#year").textContent = new Date().getFullYear();
+  await loadLibrary();
+  bind();
+  render();
+  loadYTApi();
+  routeHash();
+}
+boot();
+})();
+</script>
+</body>
+</html>

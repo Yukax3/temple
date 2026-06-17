@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "updated": "2026-06-17T00:00:00Z",
+  "genres": [
+    { "name": "Folktronica", "tracks": [] },
+    { "name": "Downtempo", "tracks": [] },
+    { "name": "Psychedelic", "tracks": [] },
+    { "name": "Goa / Psy", "tracks": [] },
+    { "name": "Trance", "tracks": [] },
+    { "name": "Hardcore", "tracks": [] },
+    { "name": "Mittelalter", "tracks": [] },
+    { "name": "Ambient", "tracks": [] },
+    {
+      "name": "Rock",
+      "tracks": [
+        {
+          "id": "BjqYAbn8Qs4",
+          "kind": "video",
+          "title": "TURBO MOSES - Desert Frost (FULL ALBUM)",
+          "artist": "Crawling Chaos",
+          "added": "2026-06-17T00:00:00Z"
+        }
+      ]
+    },
+    { "name": "Melancholie", "tracks": [] },
+    {
+      "name": "Satire / Liedermacher",
+      "tracks": [
+        { "id": "P-RQxEWn45Q", "kind": "video", "title": "Perverse", "artist": "Hans Söllner", "added": "2026-06-17T00:00:00Z" },
+        { "id": "DhBizlkl9ko", "kind": "video", "title": "Sakrament warum steig agrat oi wei i in Hundsdreck eini Blues", "artist": "Hans Söllner", "added": "2026-06-17T00:00:00Z" },
+        { "id": "eY8MLwd4dSw", "kind": "video", "title": "Edeltraut", "artist": "Hans Söllner", "added": "2026-06-17T00:00:00Z" },
+        { "id": "9WAXIDhHAJ4", "kind": "video", "title": "Das bekifft, der Text originell ist", "artist": "Götz Widmann", "added": "2026-06-17T00:00:00Z" },
+        { "id": "i-tdsgfKXmE", "kind": "video", "title": "Simone de Beauvoir", "artist": "Götz Widmann", "added": "2026-06-17T00:00:00Z" },
+        { "id": "GqXAxF4d768", "kind": "video", "title": "Der Bass muss laufen", "artist": "Rainald Grebe", "added": "2026-06-17T00:00:00Z" },
+        { "id": "r-0FiTv-xbg", "kind": "video", "title": "Sachsen", "artist": "Rainald Grebe", "added": "2026-06-17T00:00:00Z" },
+        { "id": "c8LjEjZSoNk", "kind": "video", "title": "Nicht zur Arbeit", "artist": "Joint Venture", "added": "2026-06-17T00:00:00Z" },
+        { "id": "2zX0hjhkHFo", "kind": "video", "title": "Das Bittere Ende", "artist": "Joint Venture", "added": "2026-06-17T00:00:00Z" },
+        { "id": "6swGBP08ZJQ", "kind": "video", "title": "Ne Frau die sich mich leisten kann", "artist": "Joint Venture", "added": "2026-06-17T00:00:00Z" },
+        { "id": "ekYiOVHCHYc", "kind": "video", "title": "Haschisch Rauchen Macht Harmlos", "artist": "Joint Venture", "added": "2026-06-17T00:00:00Z" },
+        { "id": "o86K1CaZ_As", "kind": "video", "title": "Dein Vater hat nen Kater", "artist": "Götz Widmann", "added": "2026-06-17T00:00:00Z" },
+        { "id": "_xYAXDovPpY", "kind": "video", "title": "Die zwei Trauben", "artist": "Götz Widmann", "added": "2026-06-17T00:00:00Z" },
+        { "id": "J55Jz8WBSbU", "kind": "video", "title": "Krawall und Remmidemmi (Deichkind)", "artist": "Simon & Jan", "added": "2026-06-17T00:00:00Z" }
+      ]
+    },
+    { "name": "Unsortiert", "tracks": [] }
+  ]
+}
