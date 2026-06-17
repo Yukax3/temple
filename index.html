@@ -250,7 +250,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;z-index:-1;
 }
 #ytwrap.show{
-  left:auto;right:14px;bottom:calc(var(--bar-h) + 14px + env(safe-area-inset-bottom));
+  left:auto;top:auto;right:14px;bottom:calc(var(--bar-h) + 14px + env(safe-area-inset-bottom));
   width:280px;height:158px;opacity:1;pointer-events:auto;z-index:60;
   border:1px solid var(--fg);background:#000;
 }
@@ -443,6 +443,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 </div>
 
 <div id="ytwrap"><div id="ytplayer"></div></div>
+<div id="scwrap" aria-hidden="true" style="position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;z-index:-1"><iframe id="scplayer" allow="autoplay" frameborder="0" scrolling="no"></iframe></div>
 
 <!-- ============ ADMIN HUB ============ -->
 <div class="admin" id="admin" role="dialog" aria-modal="true" aria-label="Admin Hub">
@@ -851,9 +852,11 @@ let openGenres = new Set();  // aufgeklappte Genre-Sektionen (Akkordeon)
 let isPlaying = false;
 let shuffle = false, repeat = false;
 let volume = 100, muted = false;
-let ytApiReady = false, ytReady = false, player = null, pendingPlay = null, ticker = null;
+let ytApiReady = false, ytReady = false, player = null, ticker = null;
+let scApiReady = false, scReady = false, scWidget = null, scPos = 0;   // SoundCloud-Engine
+let curSource = "youtube", pending = null;
 
-function uid(t){ return (t.kind||"v")+":"+t.id; }
+function uid(t){ return (t.source||"youtube")+":"+(t.kind||"v")+":"+t.id; }
 
 function ensureGenre(name){
   let g = LIB.genres.find(x=>x.name===name);
@@ -954,59 +957,78 @@ function render(){
 /* ====================================================================
    PLAYER
    ==================================================================== */
-window.onYouTubeIframeAPIReady = function(){ apiReady(); };
-function apiReady(){
-  if (ytApiReady) return;
-  ytApiReady = true;
-  if (pendingPlay){ const p = pendingPlay; pendingPlay = null; startPlay(p); }
-}
+// ---------- YouTube-Engine ----------
+window.onYouTubeIframeAPIReady = function(){ ytApiReady = true; resume("youtube"); };
 function loadYTApi(){
-  if (window.YT && window.YT.Player){ apiReady(); return; }   // API schon vorhanden (Cache/bfcache)
-  const s = document.createElement("script");
-  s.src = "https://www.youtube.com/iframe_api";
+  if (window.YT && window.YT.Player){ ytApiReady = true; return; }
+  const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(s);
 }
+// ---------- SoundCloud-Engine ----------
+function loadSCApi(){
+  const s = document.createElement("script"); s.src = "https://w.soundcloud.com/player/api.js";
+  s.onload = ()=>{ scApiReady = true; resume("soundcloud"); };
+  document.head.appendChild(s);
+}
+function resume(src){ if (pending && (pending.t.source||"youtube")===src){ const e=pending; pending=null; startPlay(e); } }
 
 function findEntry(u){ return FLAT.find(e=>uid(e.t)===u) || null; }
 function playUid(u){ const e = findEntry(u); if (e) startPlay(e); }
 
-// Player wird LAZY beim ersten Play erzeugt — mit konkreter Video-/Playlist-ID,
-// sonst baut die YT-API kein iframe.
+function startPlay(e){
+  curId = uid(e.t);
+  if (e.genre) openGenres.add(e.genre);
+  curSource = e.t.source || "youtube";
+  isPlaying = true;
+  updateBar(e);
+  if (curSource === "soundcloud") playSC(e); else playYT(e);
+  render();
+}
+
+// YouTube: Player wird LAZY mit konkreter ID erzeugt (sonst kein iframe)
 function buildPlayer(e){
-  const opts = {
-    height:"158", width:"280",
+  const opts = { height:"158", width:"280",
     playerVars:{ autoplay:1, controls:1, modestbranding:1, rel:0, playsinline:1 },
-    events:{
-      onReady:()=>{ ytReady=true; applyVolume(); if(pendingPlay){ const p=pendingPlay; pendingPlay=null; startPlay(p); } startTicker(); },
-      onStateChange:onState
-    }
-  };
+    events:{ onReady:()=>{ ytReady=true; applyVolume(); startTicker(); }, onStateChange:onState } };
   if (e.t.kind === "playlist"){ opts.playerVars.listType="playlist"; opts.playerVars.list=e.t.id; }
   else { opts.videoId = e.t.id; }
   player = new YT.Player("ytplayer", opts);
 }
-function startPlay(e){
-  curId = uid(e.t);
-  if (e.genre) openGenres.add(e.genre);   // Sektion des laufenden Tracks aufklappen
-  isPlaying = true;
-  updateBar(e);
-  if (!ytApiReady){ pendingPlay = e; render(); return; }   // API lädt noch
-  if (!player){ buildPlayer(e); render(); return; }         // erster Play überhaupt
-  if (!ytReady){ pendingPlay = e; render(); return; }       // Player konstruiert noch
-  if (e.t.kind === "playlist"){
-    player.loadPlaylist({ list:e.t.id, listType:"playlist", index:0 });
-  } else {
-    player.loadVideoById(e.t.id);
-  }
-  render();
+function playYT(e){
+  if (scWidget){ try{ scWidget.pause(); }catch(_){} }
+  if (!ytApiReady){ pending = e; return; }
+  if (!player){ buildPlayer(e); return; }
+  if (!ytReady){ pending = e; return; }
+  if (e.t.kind === "playlist") player.loadPlaylist({ list:e.t.id, listType:"playlist", index:0 });
+  else player.loadVideoById(e.t.id);
   startTicker();
 }
 function onState(ev){
-  // 1 playing, 2 paused, 0 ended
+  if (curSource !== "youtube") return;
   if (ev.data === YT.PlayerState.PLAYING){ isPlaying=true; reflectPlay(); startTicker(); }
   else if (ev.data === YT.PlayerState.PAUSED){ isPlaying=false; reflectPlay(); }
   else if (ev.data === YT.PlayerState.ENDED){ isPlaying=false; reflectPlay(); next(); }
 }
+
+// SoundCloud: Widget-API
+function scUrl(t){ return t.url || ("https://soundcloud.com/"+t.id); }
+function playSC(e){
+  if (player && ytReady){ try{ player.pauseVideo(); }catch(_){} }
+  if (!scApiReady){ pending = e; return; }
+  if (!scWidget){ buildSC(scUrl(e.t)); return; }
+  scWidget.load(scUrl(e.t), { auto_play:true, visual:false, callback:()=>{ scReady=true; applyVolume(); startTicker(); } });
+}
+function buildSC(url){
+  const ifr = $("#scplayer");
+  ifr.src = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url) +
+            "&auto_play=true&visual=false&hide_related=true&show_comments=false&show_user=false&buying=false&download=false";
+  scWidget = SC.Widget(ifr);
+  scWidget.bind(SC.Widget.Events.READY, ()=>{ scReady=true; applyVolume(); startTicker(); });
+  scWidget.bind(SC.Widget.Events.PLAY,  ()=>{ if(curSource==="soundcloud"){ isPlaying=true;  reflectPlay(); } });
+  scWidget.bind(SC.Widget.Events.PAUSE, ()=>{ if(curSource==="soundcloud"){ isPlaying=false; reflectPlay(); } });
+  scWidget.bind(SC.Widget.Events.FINISH,()=>{ if(curSource==="soundcloud") next(); });
+}
+
 function reflectPlay(){
   $("#ic-play").style.display = isPlaying ? "none":"block";
   $("#ic-pause").style.display = isPlaying ? "block":"none";
@@ -1015,25 +1037,25 @@ function reflectPlay(){
 }
 function togglePlay(){
   if (!curId){ if (FLAT.length) playUid(uid(FLAT[0].t)); return; }
+  if (curSource === "soundcloud"){ if(!scWidget) return; if(isPlaying) scWidget.pause(); else scWidget.play(); return; }
   if (!player || !ytReady) return;
   const st = player.getPlayerState();
-  if (st === YT.PlayerState.PLAYING) player.pauseVideo();
-  else player.playVideo();
+  if (st === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
 }
 function curIndex(){ return FLAT.findIndex(e=>uid(e.t)===curId); }
 function next(){
   if (!FLAT.length) return;
   if (repeat && curId){ playUid(curId); return; }
   let i = curIndex();
-  if (shuffle){ i = Math.floor(Math.random()*FLAT.length); }
-  else { i = (i+1) % FLAT.length; }
+  if (shuffle) i = Math.floor(Math.random()*FLAT.length);
+  else i = (i+1) % FLAT.length;
   playUid(uid(FLAT[i].t));
 }
 function prev(){
   if (!FLAT.length) return;
-  if (ytReady && player && player.getCurrentTime() > 3){ player.seekTo(0); return; }
-  let i = curIndex();
-  i = (i - 1 + FLAT.length) % FLAT.length;
+  const pos = curSource==="soundcloud" ? scPos : (ytReady && player ? player.getCurrentTime() : 0);
+  if (pos > 3){ if (curSource==="soundcloud" && scWidget) scWidget.seekTo(0); else if (player) player.seekTo(0,true); return; }
+  let i = curIndex(); i = (i - 1 + FLAT.length) % FLAT.length;
   playUid(uid(FLAT[i].t));
 }
 function updateBar(e){
@@ -1043,19 +1065,24 @@ function updateBar(e){
   $("#pl-artist").textContent = e.t.artist || "—";
   reflectPlay();
 }
+function updateTime(c,d){
+  $("#t-cur").textContent = fmt(c);
+  $("#t-dur").textContent = fmt(d);
+  const p = d ? (c/d) : 0;
+  $("#seek-fill").style.width = (p*100)+"%";
+  const si = $("#seek-input"); if (document.activeElement !== si) si.value = Math.round(p*1000);
+}
 function startTicker(){
   clearInterval(ticker);
   ticker = setInterval(()=>{
-    if (!player || !player.getDuration) return;
-    const d = player.getDuration() || 0;
-    const c = player.getCurrentTime() || 0;
-    $("#t-cur").textContent = fmt(c);
-    $("#t-dur").textContent = fmt(d);
-    const p = d ? (c/d) : 0;
-    $("#seek-fill").style.width = (p*100)+"%";
-    const si = $("#seek-input");
-    if (document.activeElement !== si) si.value = Math.round(p*1000);
-  }, 250);
+    if (curSource === "soundcloud"){
+      if (!scWidget) return;
+      scWidget.getPosition(p=>{ scPos=(p||0)/1000; scWidget.getDuration(d=>updateTime(scPos,(d||0)/1000)); });
+    } else {
+      if (!player || !player.getDuration) return;
+      updateTime(player.getCurrentTime()||0, player.getDuration()||0);
+    }
+  }, 300);
 }
 
 /* ====================================================================
@@ -1211,6 +1238,7 @@ function applyVolume(){
     if (muted || volume===0){ player.mute(); }
     else { player.unMute(); player.setVolume(volume); }
   }
+  if (scWidget){ try{ scWidget.setVolume(muted ? 0 : volume); }catch(_){} }
   const shown = (muted || volume===0);
   $("#vol-fill").style.width = (shown?0:volume) + "%";
   $("#ic-vol").style.display = shown ? "none":"block";
@@ -1258,10 +1286,10 @@ function bind(){
   applyVolume();
   // seek
   $("#seek-input").addEventListener("input", e=>{
-    if(!player||!player.getDuration) return;
-    const d=player.getDuration()||0; const p=e.target.value/1000;
+    const p=e.target.value/1000;
     $("#seek-fill").style.width=(p*100)+"%";
-    player.seekTo(p*d, true);
+    if (curSource==="soundcloud"){ if(scWidget) scWidget.getDuration(d=>scWidget.seekTo(p*(d||0))); }
+    else if (player && player.getDuration){ player.seekTo(p*(player.getDuration()||0), true); }
   });
 
   // admin open/close — Zugang nur über die geheime URL  #<ADMIN_KEY>
@@ -1287,6 +1315,7 @@ async function boot(){
   bind();
   render();
   loadYTApi();
+  loadSCApi();
   routeHash();
 }
 boot();
