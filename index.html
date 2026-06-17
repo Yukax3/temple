@@ -115,19 +115,26 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 /* ============================================================= GENRE SECTIONS */
 .section{border-bottom:1px solid var(--line);scroll-margin-top:108px}
 .section__head{
-  display:flex;align-items:baseline;gap:16px;padding:34px 0 14px;
+  display:flex;align-items:baseline;gap:16px;padding:30px 0;cursor:pointer;user-select:none;
 }
 .section__head h2{
   font-weight:700;text-transform:uppercase;letter-spacing:-.01em;
-  font-size:clamp(26px,5vw,46px);line-height:1;
+  font-size:clamp(26px,5vw,46px);line-height:1;transition:color .12s;
 }
+.section__head:hover h2{color:var(--accent)}
 .section__count{
   font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);
 }
 .section__line{flex:1;height:1px;background:var(--line-2);align-self:center;min-width:24px}
+.section__tog{font-family:"Space Mono",monospace;font-size:24px;color:var(--muted);line-height:1;align-self:center;width:20px;text-align:center;transition:color .12s}
+.section__tog::before{content:"+"}
+.section.open .section__tog::before{content:"\2013"}
+.section.open .section__tog{color:var(--accent)}
+.section__head:hover .section__tog{color:var(--fg)}
 
-/* track rows */
-.tracks{padding-bottom:26px}
+/* track rows — eingeklappt by default (Akkordeon, minimal) */
+.tracks{padding-bottom:26px;display:none}
+.section.open .tracks{display:block}
 .row{
   display:grid;
   grid-template-columns:42px 1fr 36px;
@@ -224,6 +231,13 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 .seek input{
   position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;
 }
+.pl__btn--sm{width:34px;height:34px}
+.pl__btn--sm svg{width:17px;height:17px}
+.pl__vol{display:flex;align-items:center;gap:8px}
+.vol{--p:100%;width:70px;height:18px;display:flex;align-items:center;cursor:pointer;position:relative;flex:none}
+.vol__track{height:3px;width:100%;background:var(--line-2);position:relative}
+.vol__fill{position:absolute;left:0;top:0;bottom:0;width:var(--p);background:var(--accent)}
+.vol input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0}
 .pl__vid{
   font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted-2);border:1px solid var(--line-2);padding:6px 8px;white-space:nowrap;
@@ -326,6 +340,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   .search{order:3;max-width:none;flex-basis:100%}
   .stage__row{grid-template-columns:1fr 140px 28px}
   .pl__right .pl__vid{display:none}
+  .vol{display:none}
   .seek{max-width:140px}
   #ytwrap.show{width:200px;height:113px}
 }
@@ -414,6 +429,14 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
     <div class="seek" id="seek">
       <div class="seek__track"><div class="seek__fill" id="seek-fill"></div></div>
       <input type="range" id="seek-input" min="0" max="1000" value="0" aria-label="Position">
+    </div>
+    <div class="pl__vol">
+      <button class="pl__btn pl__btn--sm" id="btn-vol" aria-label="Stumm schalten" title="Lautstärke / Stumm">
+        <svg id="ic-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16.5 8.5a4 4 0 0 1 0 7"/></svg>
+        <svg id="ic-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16 9l5 6M21 9l-5 6"/></svg>
+      </button>
+      <div class="vol" id="vol"><div class="vol__track"><div class="vol__fill" id="vol-fill"></div></div>
+        <input type="range" id="vol-input" min="0" max="100" value="100" aria-label="Lautstärke"></div>
     </div>
     <button class="pl__vid" id="btn-video" title="YouTube-Video ein-/ausblenden">Video</button>
   </div>
@@ -514,50 +537,64 @@ const GENRE_RULES = [
   ["[tekno]","Freetekno / Tekno"], ["free tekno","Freetekno / Tekno"], ["freetekno","Freetekno / Tekno"],
   ["mental tekno","Freetekno / Tekno"], ["hardtek","Freetekno / Tekno"], ["tribecore","Freetekno / Tekno"],
   ["(tekno","Freetekno / Tekno"], ["tekkno","Freetekno / Tekno"], ["gabber","Hardcore / Gabber"],
-  ["gabbermukke","Hardcore / Gabber"], ["schranz","Techno / House"], ["israel vibration","Reggae / Dub"],
-  ["gladiators","Reggae / Dub"], ["bob marley","Reggae / Dub"], ["peter tosh","Reggae / Dub"],
-  ["gregory isaacs","Reggae / Dub"], ["josey wales","Reggae / Dub"], ["the congos","Reggae / Dub"],
-  ["burning spear","Reggae / Dub"], ["pablo moses","Reggae / Dub"], ["yabby you","Reggae / Dub"],
-  ["viceroys","Reggae / Dub"], ["sizzla","Reggae / Dub"], ["protoje","Reggae / Dub"],
-  ["julian marley","Reggae / Dub"], ["alborosie","Reggae / Dub"], ["stick figure","Reggae / Dub"],
-  ["ub40","Reggae / Dub"], ["inner circle","Reggae / Dub"], ["musical youth","Reggae / Dub"],
-  ["eddy grant","Reggae / Dub"], ["groundation","Reggae / Dub"], ["twinkle brothers","Reggae / Dub"],
-  ["don carlos","Reggae / Dub"], ["barrington levy","Reggae / Dub"], ["ini kamoze","Reggae / Dub"],
-  ["martin jondo","Reggae / Dub"], ["raggabund","Reggae / Dub"], ["taiwan mc","Reggae / Dub"],
-  ["mystic revelation","Reggae / Dub"], ["lodeva sound","Reggae / Dub"], ["jah guidance","Reggae / Dub"],
-  ["jamaican roots","Reggae / Dub"], ["mystic realness","Reggae / Dub"], ["reggaeville","Reggae / Dub"],
-  ["shaolin vibes","Reggae / Dub"], ["bionic dub","Reggae / Dub"], ["duba dub","Reggae / Dub"],
-  ["crucial brew","Reggae / Dub"], ["seven beats music","Reggae / Dub"], ["jacob miller","Reggae / Dub"],
-  ["vivian jones","Reggae / Dub"], ["horace martin","Reggae / Dub"], ["jah sun","Reggae / Dub"],
-  ["marlon asher","Reggae / Dub"], ["reggae professor","Reggae / Dub"], ["zaidinreggae","Reggae / Dub"],
-  ["roman stewart","Reggae / Dub"], ["carlene davis","Reggae / Dub"], ["desi roots","Reggae / Dub"],
-  ["everton dacres","Reggae / Dub"], ["freddie mckay","Reggae / Dub"], ["twelve tribes","Reggae / Dub"],
-  ["toney barrett","Reggae / Dub"], ["tony brutus","Reggae / Dub"], ["tony ford","Reggae / Dub"],
-  ["the ovations","Reggae / Dub"], ["hortense ellis","Reggae / Dub"], ["jennifer lara","Reggae / Dub"],
-  ["bro yahya","Reggae / Dub"], ["midnight riders","Reggae / Dub"], ["mikey dread","Reggae / Dub"],
-  ["dub garden","Reggae / Dub"], ["dreadlights","Reggae / Dub"], ["stereo ferment","Reggae / Dub"],
-  ["space dub","Reggae / Dub"], ["reggae","Reggae / Dub"], ["roots reggae","Reggae / Dub"],
-  [" dub","Reggae / Dub"], ["ganja","Reggae / Dub"], ["rastaman","Reggae / Dub"], [" jah ","Reggae / Dub"],
-  ["chalice","Reggae / Dub"], ["herbal roots","Reggae / Dub"], ["weed bun","Reggae / Dub"],
-  ["calypso rose","Reggae / Dub"], ["manu chao","Reggae / Dub"], ["mano negra","Reggae / Dub"],
-  ["groundation","Reggae / Dub"], ["culture - topic","Reggae / Dub"], ["yellowman","Reggae / Dub"],
-  ["sashamon","Reggae / Dub"], ["zodiakk","Reggae / Dub"], ["gangsta","Reggae / Dub"],
-  ["conscious roots","Reggae / Dub"], ["ragga","Reggae / Dub"], ["skank","Reggae / Dub"],
-  ["alborosie","Reggae / Dub"], ["protoje","Reggae / Dub"], ["stick figure","Reggae / Dub"],
-  ["peter tosh","Reggae / Dub"], ["bob marley","Reggae / Dub"], ["julian marley","Reggae / Dub"],
-  ["spud","Reggae / Dub"], ["the congos","Reggae / Dub"], ["ovations","Reggae / Dub"],
-  ["ini kamoze","Reggae / Dub"], ["soellner","Satire / Liedermacher"], ["sollner","Satire / Liedermacher"],
-  ["gotz widmann","Satire / Liedermacher"], ["widmann","Satire / Liedermacher"],
-  ["rainald grebe","Satire / Liedermacher"], ["joint venture","Satire / Liedermacher"],
-  ["hannes wader","Satire / Liedermacher"], ["funny van dannen","Satire / Liedermacher"],
-  ["schnipo schranke","Satire / Liedermacher"], ["schnipo","Satire / Liedermacher"],
-  ["rakede","Satire / Liedermacher"], ["walter westrupp","Satire / Liedermacher"],
-  ["pfui&deifel","Satire / Liedermacher"], ["turbo moses","Stoner / Doom"], ["stoned jesus","Stoner / Doom"],
-  ["naxatras","Stoner / Doom"], ["king buffalo","Stoner / Doom"], ["electric wizard","Stoner / Doom"],
-  ["black sabbath","Stoner / Doom"], ["kyuss","Stoner / Doom"], ["dozer","Stoner / Doom"],
-  ["truckfighters","Stoner / Doom"], ["stoned cobra","Stoner / Doom"], ["earthless","Stoner / Doom"],
-  ["spiral caravan","Stoner / Doom"], ["the myrrors","Stoner / Doom"], ["sun dial","Stoner / Doom"],
-  ["unida","Stoner / Doom"], ["daevar","Stoner / Doom"], ["stoner","Stoner / Doom"], ["doom","Stoner / Doom"],
+  ["gabbermukke","Hardcore / Gabber"], ["schranz","Techno / House"], ["israel vibration","Roots Reggae"],
+  ["burning spear","Roots Reggae"], ["the congos","Roots Reggae"], [" congos","Roots Reggae"],
+  ["the gladiators","Roots Reggae"], ["gladiators","Roots Reggae"], ["twinkle brothers","Roots Reggae"],
+  ["gregory isaacs","Roots Reggae"], ["peter tosh","Roots Reggae"], ["bob marley","Roots Reggae"],
+  [" marley","Roots Reggae"], ["pablo moses","Roots Reggae"], ["the viceroys","Roots Reggae"],
+  ["viceroys","Roots Reggae"], ["yabby you","Roots Reggae"], ["don carlos","Roots Reggae"],
+  ["jacob miller","Roots Reggae"], ["sam carty","Roots Reggae"], ["vivian jones","Roots Reggae"],
+  ["horace martin","Roots Reggae"], ["roman stewart","Roots Reggae"], ["carlene davis","Roots Reggae"],
+  ["desi roots","Roots Reggae"], ["everton dacres","Roots Reggae"], ["freddie mckay","Roots Reggae"],
+  ["the ovations","Roots Reggae"], ["toney barrett","Roots Reggae"], ["tony brutus","Roots Reggae"],
+  ["tony ford","Roots Reggae"], ["hortense ellis","Roots Reggae"], ["jennifer lara","Roots Reggae"],
+  ["bro yahya","Roots Reggae"], ["mikey dread","Roots Reggae"], ["ini kamoze","Roots Reggae"],
+  ["culture - topic","Roots Reggae"], ["mystic revelation","Roots Reggae"],
+  ["twelve tribes of israel","Roots Reggae"], ["jah solid rock","Roots Reggae"], ["deep roots","Roots Reggae"],
+  ["roots reggae","Roots Reggae"], ["israel vibration","Reggae / Dub"], ["gladiators","Reggae / Dub"],
+  ["bob marley","Reggae / Dub"], ["peter tosh","Reggae / Dub"], ["gregory isaacs","Reggae / Dub"],
+  ["josey wales","Reggae / Dub"], ["the congos","Reggae / Dub"], ["burning spear","Reggae / Dub"],
+  ["pablo moses","Reggae / Dub"], ["yabby you","Reggae / Dub"], ["viceroys","Reggae / Dub"],
+  ["sizzla","Reggae / Dub"], ["protoje","Reggae / Dub"], ["julian marley","Reggae / Dub"],
+  ["alborosie","Reggae / Dub"], ["stick figure","Reggae / Dub"], ["ub40","Reggae / Dub"],
+  ["inner circle","Reggae / Dub"], ["musical youth","Reggae / Dub"], ["eddy grant","Reggae / Dub"],
+  ["groundation","Reggae / Dub"], ["twinkle brothers","Reggae / Dub"], ["don carlos","Reggae / Dub"],
+  ["barrington levy","Reggae / Dub"], ["ini kamoze","Reggae / Dub"], ["martin jondo","Reggae / Dub"],
+  ["raggabund","Reggae / Dub"], ["taiwan mc","Reggae / Dub"], ["mystic revelation","Reggae / Dub"],
+  ["lodeva sound","Reggae / Dub"], ["jah guidance","Reggae / Dub"], ["jamaican roots","Reggae / Dub"],
+  ["mystic realness","Reggae / Dub"], ["reggaeville","Reggae / Dub"], ["shaolin vibes","Reggae / Dub"],
+  ["bionic dub","Reggae / Dub"], ["duba dub","Reggae / Dub"], ["crucial brew","Reggae / Dub"],
+  ["seven beats music","Reggae / Dub"], ["jacob miller","Reggae / Dub"], ["vivian jones","Reggae / Dub"],
+  ["horace martin","Reggae / Dub"], ["jah sun","Reggae / Dub"], ["marlon asher","Reggae / Dub"],
+  ["reggae professor","Reggae / Dub"], ["zaidinreggae","Reggae / Dub"], ["roman stewart","Reggae / Dub"],
+  ["carlene davis","Reggae / Dub"], ["desi roots","Reggae / Dub"], ["everton dacres","Reggae / Dub"],
+  ["freddie mckay","Reggae / Dub"], ["twelve tribes","Reggae / Dub"], ["toney barrett","Reggae / Dub"],
+  ["tony brutus","Reggae / Dub"], ["tony ford","Reggae / Dub"], ["the ovations","Reggae / Dub"],
+  ["hortense ellis","Reggae / Dub"], ["jennifer lara","Reggae / Dub"], ["bro yahya","Reggae / Dub"],
+  ["midnight riders","Reggae / Dub"], ["mikey dread","Reggae / Dub"], ["dub garden","Reggae / Dub"],
+  ["dreadlights","Reggae / Dub"], ["stereo ferment","Reggae / Dub"], ["space dub","Reggae / Dub"],
+  ["reggae","Reggae / Dub"], ["roots reggae","Reggae / Dub"], [" dub","Reggae / Dub"],
+  ["ganja","Reggae / Dub"], ["rastaman","Reggae / Dub"], [" jah ","Reggae / Dub"], ["chalice","Reggae / Dub"],
+  ["herbal roots","Reggae / Dub"], ["weed bun","Reggae / Dub"], ["calypso rose","Reggae / Dub"],
+  ["manu chao","Reggae / Dub"], ["mano negra","Reggae / Dub"], ["groundation","Reggae / Dub"],
+  ["culture - topic","Reggae / Dub"], ["yellowman","Reggae / Dub"], ["sashamon","Reggae / Dub"],
+  ["zodiakk","Reggae / Dub"], ["gangsta","Reggae / Dub"], ["conscious roots","Reggae / Dub"],
+  ["ragga","Reggae / Dub"], ["skank","Reggae / Dub"], ["alborosie","Reggae / Dub"], ["protoje","Reggae / Dub"],
+  ["stick figure","Reggae / Dub"], ["peter tosh","Reggae / Dub"], ["bob marley","Reggae / Dub"],
+  ["julian marley","Reggae / Dub"], ["spud","Reggae / Dub"], ["the congos","Reggae / Dub"],
+  ["ovations","Reggae / Dub"], ["ini kamoze","Reggae / Dub"], ["soellner","Satire / Liedermacher"],
+  ["sollner","Satire / Liedermacher"], ["gotz widmann","Satire / Liedermacher"],
+  ["widmann","Satire / Liedermacher"], ["rainald grebe","Satire / Liedermacher"],
+  ["joint venture","Satire / Liedermacher"], ["hannes wader","Satire / Liedermacher"],
+  ["funny van dannen","Satire / Liedermacher"], ["schnipo schranke","Satire / Liedermacher"],
+  ["schnipo","Satire / Liedermacher"], ["rakede","Satire / Liedermacher"],
+  ["walter westrupp","Satire / Liedermacher"], ["pfui&deifel","Satire / Liedermacher"],
+  ["turbo moses","Stoner / Doom"], ["stoned jesus","Stoner / Doom"], ["naxatras","Stoner / Doom"],
+  ["king buffalo","Stoner / Doom"], ["electric wizard","Stoner / Doom"], ["black sabbath","Stoner / Doom"],
+  ["kyuss","Stoner / Doom"], ["dozer","Stoner / Doom"], ["truckfighters","Stoner / Doom"],
+  ["stoned cobra","Stoner / Doom"], ["earthless","Stoner / Doom"], ["spiral caravan","Stoner / Doom"],
+  ["the myrrors","Stoner / Doom"], ["sun dial","Stoner / Doom"], ["unida","Stoner / Doom"],
+  ["daevar","Stoner / Doom"], ["stoner","Stoner / Doom"], ["doom","Stoner / Doom"],
   ["desert cruiser","Stoner / Doom"], ["fuzz","Stoner / Doom"], ["sakaros","Stoner / Doom"],
   ["stoned meadow","Stoner / Doom"], ["rubber zebra","Stoner / Doom"], ["stoned","Stoner / Doom"],
   ["psychedelicious","Goa / Psytrance"], ["aardvarkk","Goa / Psytrance"], ["altar records","Goa / Psytrance"],
@@ -693,6 +730,71 @@ const GENRE_RULES = [
   ["os tincoas","Folktronica / Shamanic"], ["os tincoãs","Folktronica / Shamanic"],
   ["shaman","Folktronica / Shamanic"], ["sagrada","Folktronica / Shamanic"],
   ["cosmica","Folktronica / Shamanic"], ["encantos","Folktronica / Shamanic"],
+  ["maneesh de moor","Healing / Meditation"], ["anugama","Healing / Meditation"],
+  ["liquid mind","Healing / Meditation"], ["yulia klenova","Healing / Meditation"],
+  ["neowake","Healing / Meditation"], ["the sound healers","Healing / Meditation"],
+  ["zenscape","Healing / Meditation"], ["gerhard & einat","Healing / Meditation"],
+  ["ajeet","Healing / Meditation"], ["ram dass","Healing / Meditation"], ["solfeggio","Healing / Meditation"],
+  ["852 hz","Healing / Meditation"], ["528 hz","Healing / Meditation"], ["963 hz","Healing / Meditation"],
+  ["741 hz","Healing / Meditation"], ["111hz","Healing / Meditation"], ["136.1hz","Healing / Meditation"],
+  ["90hz","Healing / Meditation"], ["metatron","Healing / Meditation"], ["savasana","Healing / Meditation"],
+  ["natarajasana","Healing / Meditation"], ["sound healing","Healing / Meditation"],
+  ["healing song","Healing / Meditation"], ["healing earth","Healing / Meditation"],
+  ["healing ocean","Healing / Meditation"], ["relaxation ocean","Healing / Meditation"],
+  ["liquid mind","Healing / Meditation"], ["savvas kalt","Healing / Meditation"],
+  ["el buho","Organic / Ethno"], ["el búho","Organic / Ethno"], ["joaquin cornejo","Organic / Ethno"],
+  ["joaquín cornejo","Organic / Ethno"], ["seba campos","Organic / Ethno"], [" yuri","Organic / Ethno"],
+  ["aguila real","Organic / Ethno"], ["águila real","Organic / Ethno"], ["lagartijeando","Organic / Ethno"],
+  ["desert dwellers","Organic / Ethno"], ["danit","Organic / Ethno"], ["mahumen","Organic / Ethno"],
+  ["lido pimienta","Organic / Ethno"], ["pablo rozas","Organic / Ethno"], ["nibana","Organic / Ethno"],
+  ["aware","Organic / Ethno"], ["awarë","Organic / Ethno"], ["deya dova","Organic / Ethno"],
+  ["geometrae","Organic / Ethno"], ["ayla schafer","Organic / Ethno"], ["jordi cantos","Organic / Ethno"],
+  ["yaima","Organic / Ethno"], ["mogli","Organic / Ethno"], ["xavier rudd","Organic / Ethno"],
+  ["soma frequency","Organic / Ethno"], ["jiboia branca","Organic / Ethno"], ["gingai","Organic / Ethno"],
+  ["gingaí","Organic / Ethno"], ["matanza","Organic / Ethno"], ["ibu selva","Organic / Ethno"],
+  ["ignacio maria gomez","Organic / Ethno"], ["ballake sissoko","Organic / Ethno"],
+  ["xuqutopi","Organic / Ethno"], ["savaborsa","Organic / Ethno"], ["resueno","Organic / Ethno"],
+  ["resueño","Organic / Ethno"], ["mollie mendoza","Organic / Ethno"], ["alex serra","Organic / Ethno"],
+  ["al fredo","Organic / Ethno"], ["canal dany matos","Organic / Ethno"], ["byron metcalf","Organic / Ethno"],
+  ["namaste","Organic / Ethno"], ["jaya shiva","Organic / Ethno"], ["mercedes sosa","Organic / Ethno"],
+  ["spirit bird","Organic / Ethno"], ["didgeridoo","Organic / Ethno"], ["dojo rich","Organic / Ethno"],
+  ["wakan tanka","Organic / Ethno"], ["kauyumari","Organic / Ethno"], ["madreselva","Organic / Ethno"],
+  ["floresta","Organic / Ethno"], ["pachamama","Organic / Ethno"], ["rapé","Organic / Ethno"],
+  ["icaro","Organic / Ethno"], ["sebananda","Organic / Ethno"], ["be svendsen","Organic / Ethno"],
+  ["cercle","Organic / Ethno"], ["ignacio maria","Organic / Ethno"], ["helico","Organic / Ethno"],
+  ["gracias madre","Organic / Ethno"], ["taita inti","Organic / Ethno"], ["força do rapé","Organic / Ethno"],
+  ["força do rape","Organic / Ethno"], ["mapping the cosmos","Organic / Ethno"], ["brian eno","Ambient / IDM"],
+  ["fripp & eno","Ambient / IDM"], ["fripp and eno","Ambient / IDM"], ["steve roach","Ambient / IDM"],
+  ["lustmord","Ambient / IDM"], ["biosphere","Ambient / IDM"], ["nala sinephro","Ambient / IDM"],
+  ["jon hopkins","Ambient / IDM"], ["ocoeur","Ambient / IDM"], ["phill niblock","Ambient / IDM"],
+  ["astronaut ape","Ambient / IDM"], ["stretched","Ambient / IDM"], ["myst - topic","Ambient / IDM"],
+  ["aram bajakian","Ambient / IDM"], ["sounds of snow","Ambient / IDM"], ["deeb - topic","Ambient / IDM"],
+  ["77 million paintings","Ambient / IDM"], ["equatorial stars","Ambient / IDM"],
+  ["substrata","Ambient / IDM"], ["ziqooh","Ambient / IDM"], ["adam dodson","Ambient / IDM"],
+  ["crone - topic","Goa / Psytrance"], ["cursed souls","Goa / Psytrance"], ["bao kao","Goa / Psytrance"],
+  ["raik","Goa / Psytrance"], ["aseckas","Goa / Psytrance"], ["witch - seer","Stoner / Doom"],
+  ["lemon fog","Psychedelic Rock"], ["khruangbin","Psychedelic Rock"], ["spellsw","Mittelalter / Neofolk"],
+  ["years of silence","Mittelalter / Neofolk"], ["ruumisto","Mittelalter / Neofolk"],
+  [" tir ","Mittelalter / Neofolk"], ["scholastum","Mittelalter / Neofolk"],
+  ["stephan busse","Techno / House"], ["torsten kanzler","Techno / House"], ["bretthit","Techno / House"],
+  ["brett hit","Techno / House"], ["le wanski","Downtempo / Trip-Hop"], ["vanilla -","Downtempo / Trip-Hop"],
+  ["mischluft","Downtempo / Trip-Hop"], ["j.pool","Downtempo / Trip-Hop"],
+  ["nala sinephro","Downtempo / Trip-Hop"], ["kevin morby","Indie / Dream-Pop"],
+  ["michelle gurevich","Indie / Dream-Pop"], ["sault","Indie / Dream-Pop"], ["the folks","Indie / Dream-Pop"],
+  ["finnegan tui","Indie / Dream-Pop"], ["mellow movez","Indie / Dream-Pop"],
+  ["charlie hunter","Indie / Dream-Pop"], ["celine dessberg","Indie / Dream-Pop"],
+  ["céline dessberg","Indie / Dream-Pop"], ["analog sunshine","Indie / Dream-Pop"],
+  ["southstar","Indie / Dream-Pop"], ["tonic walter","Indie / Dream-Pop"],
+  ["still corners","Indie / Dream-Pop"], ["kowloon","Indie / Dream-Pop"],
+  ["björn andersson","Indie / Dream-Pop"], ["fluidage","Indie / Dream-Pop"], ["men at work","Rock / Classic"],
+  ["chris isaak","Rock / Classic"], ["neil young","Rock / Classic"], ["cortez the killer","Rock / Classic"],
+  ["horse with no name","Rock / Classic"], ["losing my religion","Rock / Classic"], ["r.e.m","Rock / Classic"],
+  ["blur - song 2","Rock / Classic"], ["rondo veneziano","Rock / Classic"],
+  ["rondò veneziano","Rock / Classic"], ["witch","Rock / Classic"], ["puhdys","Rock / Classic"],
+  ["greeen","Hip-Hop"], ["upstruct","Hip-Hop"], ["mc bomber","Hip-Hop"],
+  ["simon & jan","Satire / Liedermacher"], ["simonundjan","Satire / Liedermacher"],
+  ["simon und jan","Satire / Liedermacher"], ["schnipo","Satire / Liedermacher"],
+  ["revolte springen","Satire / Liedermacher"], ["scheissen auf karriere","Satire / Liedermacher"],
 ];
 function classify(title, channel){
   const h = norm((title||"") + " " + (channel||""));
@@ -740,13 +842,15 @@ async function fetchMeta(url){
    STATE
    ==================================================================== */
 const LS_KEY = "temple_library_v1";
-const SEED_GENRES = ["Goa / Psytrance", "Psybient / Psychill", "Ambient / IDM", "Downtempo / Trip-Hop", "Techno / House", "Freetekno / Tekno", "Hardcore / Gabber", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Rock / Classic", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Mittelalter / Neofolk", "Satire / Liedermacher", "Unsortiert"];
+const SEED_GENRES = ["Goa / Psytrance", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Techno / House", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Rock / Classic", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Unsortiert"];
 
 let LIB = { version:1, updated:null, genres:[] };  // working copy
 let FLAT = [];          // flattened, filtered playable list (current view order)
 let curId = null;       // currently playing entry uid
+let openGenres = new Set();  // aufgeklappte Genre-Sektionen (Akkordeon)
 let isPlaying = false;
 let shuffle = false, repeat = false;
+let volume = 100, muted = false;
 let ytApiReady = false, ytReady = false, player = null, pendingPlay = null, ticker = null;
 
 function uid(t){ return (t.kind||"v")+":"+t.id; }
@@ -810,7 +914,8 @@ function render(){
     gnav.appendChild(a);
 
     const sec = document.createElement("section");
-    sec.className = "section";
+    const isOpen = openGenres.has(g.name) || (q && matches.length);
+    sec.className = "section" + (isOpen ? " open" : "");
     sec.id = id;
     let rows = "";
     matches.forEach((t)=>{
@@ -830,10 +935,11 @@ function render(){
     if (!rows){
       rows = `<div class="empty">// LEER — <b>im Hub befüllen</b></div>`;
     }
-    sec.innerHTML = `<div class="section__head">
+    sec.innerHTML = `<div class="section__head" role="button" tabindex="0" data-genre="${esc(g.name)}" aria-expanded="${isOpen?'true':'false'}">
         <h2>${esc(g.name)}</h2>
         <span class="section__line"></span>
         <span class="section__count">${matches.length} / ${g.tracks.length}</span>
+        <span class="section__tog" aria-hidden="true"></span>
       </div><div class="tracks">${rows}</div>`;
     idx.appendChild(sec);
   });
@@ -871,7 +977,7 @@ function buildPlayer(e){
     height:"158", width:"280",
     playerVars:{ autoplay:1, controls:1, modestbranding:1, rel:0, playsinline:1 },
     events:{
-      onReady:()=>{ ytReady=true; if(pendingPlay){ const p=pendingPlay; pendingPlay=null; startPlay(p); } startTicker(); },
+      onReady:()=>{ ytReady=true; applyVolume(); if(pendingPlay){ const p=pendingPlay; pendingPlay=null; startPlay(p); } startTicker(); },
       onStateChange:onState
     }
   };
@@ -881,6 +987,7 @@ function buildPlayer(e){
 }
 function startPlay(e){
   curId = uid(e.t);
+  if (e.genre) openGenres.add(e.genre);   // Sektion des laufenden Tracks aufklappen
   isPlaying = true;
   updateBar(e);
   if (!ytApiReady){ pendingPlay = e; render(); return; }   // API lädt noch
@@ -1099,20 +1206,43 @@ function setStat(sel,msg,cls){ const el=$(sel); el.textContent=msg; el.className
 /* ====================================================================
    WIRING
    ==================================================================== */
+function applyVolume(){
+  if (player && ytReady){
+    if (muted || volume===0){ player.mute(); }
+    else { player.unMute(); player.setVolume(volume); }
+  }
+  const shown = (muted || volume===0);
+  $("#vol-fill").style.width = (shown?0:volume) + "%";
+  $("#ic-vol").style.display = shown ? "none":"block";
+  $("#ic-mute").style.display = shown ? "block":"none";
+  const vi = $("#vol-input"); if (document.activeElement!==vi) vi.value = muted?0:volume;
+}
+
+function toggleGenre(name, head){
+  const sec = head && head.closest(".section");
+  const open = !(sec && sec.classList.contains("open"));
+  if (open) openGenres.add(name); else openGenres.delete(name);
+  if (sec){ sec.classList.toggle("open", open); head.setAttribute("aria-expanded", open?"true":"false"); }
+}
+
 function bind(){
   // search
   let to;
   $("#search").addEventListener("input", ()=>{ clearTimeout(to); to=setTimeout(render,120); });
 
-  // delegated row click
+  // delegated: row = play, section head = auf-/zuklappen
   $("#index").addEventListener("click", e=>{
-    const row = e.target.closest(".row"); if(!row) return;
-    playUid(row.dataset.uid);
+    const row = e.target.closest(".row");
+    if (row){ playUid(row.dataset.uid); return; }
+    const head = e.target.closest(".section__head");
+    if (head) toggleGenre(head.dataset.genre, head);
   });
   $("#index").addEventListener("keydown", e=>{
     if (e.key!=="Enter" && e.key!==" ") return;
-    const row = e.target.closest(".row"); if(!row) return;
-    e.preventDefault(); playUid(row.dataset.uid);
+    const row = e.target.closest(".row");
+    if (row){ e.preventDefault(); playUid(row.dataset.uid); return; }
+    const head = e.target.closest(".section__head");
+    if (head){ e.preventDefault(); toggleGenre(head.dataset.genre, head); }
   });
 
   // player controls
@@ -1122,6 +1252,10 @@ function bind(){
   $("#btn-shuffle").onclick = e=>{ shuffle=!shuffle; e.currentTarget.classList.toggle("is-on",shuffle); };
   $("#btn-repeat").onclick = e=>{ repeat=!repeat; e.currentTarget.classList.toggle("is-on",repeat); };
   $("#btn-video").onclick = e=>{ const on=$("#ytwrap").classList.toggle("show"); e.currentTarget.classList.toggle("is-on",on); };
+  // volume
+  $("#vol-input").addEventListener("input", e=>{ volume=+e.target.value; muted=(volume===0); applyVolume(); });
+  $("#btn-vol").onclick = ()=>{ muted=!muted; if(!muted && volume===0) volume=60; applyVolume(); };
+  applyVolume();
   // seek
   $("#seek-input").addEventListener("input", e=>{
     if(!player||!player.getDuration) return;
