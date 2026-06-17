@@ -224,7 +224,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 .pl__time{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);white-space:nowrap}
 /* simulierter Equalizer (kein echtes FFT — YT/SC-Audio ist cross-origin) */
 .viz{display:flex;align-items:flex-end;gap:2px;height:26px;width:92px;flex:none;margin-left:4px}
-.viz span{flex:1;min-width:2px;background:var(--accent);transform:scaleY(.1);transform-origin:bottom;
+.viz span{flex:1;min-width:2px;height:100%;background:var(--accent);transform:scaleY(.1);transform-origin:bottom;
   animation-name:viz;animation-iteration-count:infinite;animation-direction:alternate;animation-timing-function:ease-in-out;animation-play-state:paused;opacity:.85}
 .player.playing .viz span{animation-play-state:running}
 @keyframes viz{ to{ transform:scaleY(1); } }
