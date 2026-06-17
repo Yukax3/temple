@@ -222,6 +222,12 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 .pl__btn.is-on{color:var(--accent)}
 .pl__right{display:flex;align-items:center;gap:14px;justify-content:flex-end;min-width:0}
 .pl__time{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+/* simulierter Equalizer (kein echtes FFT — YT/SC-Audio ist cross-origin) */
+.viz{display:flex;align-items:flex-end;gap:2px;height:26px;width:92px;flex:none;margin-left:4px}
+.viz span{flex:1;min-width:2px;background:var(--accent);transform:scaleY(.1);transform-origin:bottom;
+  animation-name:viz;animation-iteration-count:infinite;animation-direction:alternate;animation-timing-function:ease-in-out;animation-play-state:paused;opacity:.85}
+.player.playing .viz span{animation-play-state:running}
+@keyframes viz{ to{ transform:scaleY(1); } }
 .pl__time b{color:var(--fg);font-weight:400}
 .seek{
   --p:0%;flex:1;max-width:280px;height:18px;display:flex;align-items:center;cursor:pointer;position:relative;
@@ -341,6 +347,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   .stage__row{grid-template-columns:1fr 140px 28px}
   .pl__right .pl__vid{display:none}
   .vol{display:none}
+  .viz{display:none}
   .seek{max-width:140px}
   #ytwrap.show{width:200px;height:113px}
 }
@@ -405,6 +412,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
       <div class="pl__title" id="pl-title">—</div>
       <div class="pl__artist" id="pl-artist">—</div>
     </div>
+    <div class="viz" id="viz" aria-hidden="true"></div>
   </div>
   <div class="pl__ctrls">
     <button class="pl__btn" id="btn-shuffle" aria-label="Zufall" title="Zufall">
@@ -528,6 +536,14 @@ const fmt = t => { t=Math.max(0,Math.floor(t||0)); const m=Math.floor(t/60), s=t
 /* ---------- genre classifier (heuristik, kein API-key) ---------- */
 /* Reihenfolge = Priorität bei Gleichstand. Stichwörter frei erweiterbar. */
 const GENRE_RULES = [
+  ["meiko","Chill / Lounge"], ["leave the lights on","Chill / Lounge"], ["omer balik","Chill / Lounge"],
+  ["omer balık","Chill / Lounge"], ["coffee blues","Chill / Lounge"], ["bon iver","Chill / Lounge"],
+  ["daniel norgren","Akustik / Folk"], ["hermanos gutierrez","Akustik / Folk"],
+  ["hermanos gutiérrez","Akustik / Folk"], ["estas tonne","Akustik / Folk"], ["estás tonné","Akustik / Folk"],
+  ["jose gonzalez","Akustik / Folk"], ["josé gonzález","Akustik / Folk"], ["ben howard","Akustik / Folk"],
+  ["keaton henson","Akustik / Folk"], ["gnarls barkley","Indie / Dream-Pop"],
+  ["adam vandal","Freetekno / Tekno"], ["adam vandal","Freetekno / Tekno"], ["grasgeflüster","Reggae / Dub"],
+  ["grasgefluster","Reggae / Dub"], ["trip hazard","Psychedelic Rock"], ["game of thrones","Game / OST"],
   ["psychedelic rock","Psychedelic Rock"], ["psych rock","Psychedelic Rock"],
   ["space rock","Psychedelic Rock"], ["dungeon synth","Mittelalter / Neofolk"],
   ["psychedelic kung fu","Psychedelic Rock"], ["psychill","Psybient / Psychill"],
@@ -796,6 +812,93 @@ const GENRE_RULES = [
   ["simon & jan","Satire / Liedermacher"], ["simonundjan","Satire / Liedermacher"],
   ["simon und jan","Satire / Liedermacher"], ["schnipo","Satire / Liedermacher"],
   ["revolte springen","Satire / Liedermacher"], ["scheissen auf karriere","Satire / Liedermacher"],
+  ["paul kalkbrenner","Techno / House"], ["kalkbrenner","Techno / House"], ["muschi muschi","Techno / House"],
+  ["dbbd","Techno / House"], ["gigi d'agostino","Techno / House"], ["gigi dagostino","Techno / House"],
+  ["ben bohmer","Techno / House"], ["ben böhmer","Techno / House"], ["luttrell","Techno / House"],
+  ["isaac chambers","Techno / House"], ["aaron smith - dancin","Techno / House"], ["trabireiter","Punk"],
+  ["deutschpunk","Punk"], ["schweine + benzin","Punk"], ["schweine und benzin","Punk"], ["2pac","Hip-Hop"],
+  ["50 cent","Hip-Hop"], ["dr. dre","Hip-Hop"], ["dr dre","Hip-Hop"], ["ice cube","Hip-Hop"],
+  ["kendrick lamar","Hip-Hop"], ["j. cole","Hip-Hop"], ["jay-z","Hip-Hop"], ["jaÿ-z","Hip-Hop"],
+  ["kid cudi","Hip-Hop"], ["lil wayne","Hip-Hop"], ["lil uzi vert","Hip-Hop"], ["logic -","Hip-Hop"],
+  ["migos","Hip-Hop"], ["mask off","Hip-Hop"], ["notorious b.i.g","Hip-Hop"], ["outkast","Hip-Hop"],
+  ["schoolboy q","Hip-Hop"], ["sheck wes","Hip-Hop"], ["travis scott","Hip-Hop"],
+  ["tyler, the creator","Hip-Hop"], ["tone loc","Hip-Hop"], ["rob stone","Hip-Hop"], ["chill bill","Hip-Hop"],
+  ["mo bamba","Hip-Hop"], ["gnarls barkley","Hip-Hop"], ["earfquake","Hip-Hop"], ["sicko mode","Hip-Hop"],
+  ["ms. jackson","Hip-Hop"], ["big poppa","Hip-Hop"], ["day 'n' nite","Hip-Hop"], ["indica badu","Hip-Hop"],
+  ["no role modelz","Hip-Hop"], ["poké & chill","Game / OST"], ["poke & chill","Game / OST"],
+  ["gamechops","Game / OST"], ["dryante","Game / OST"], ["baldur's gate","Game / OST"],
+  ["baldurs gate","Game / OST"], ["skyrim","Game / OST"], ["morrowind","Game / OST"],
+  ["oblivion","Game / OST"], ["stronghold","Game / OST"], ["heroes of might","Game / OST"],
+  ["divinity: original sin","Game / OST"], ["game of thrones","Game / OST"], ["mandalorian","Game / OST"],
+  ["tenet official","Game / OST"], ["ennio morricone","Game / OST"], ["greatest western","Game / OST"],
+  ["imaginary western","Game / OST"], ["oscars theme","Game / OST"], ["star wars","Game / OST"],
+  ["light of the seven","Game / OST"], ["two mandolins","Game / OST"], ["fluch der karibik","Game / OST"],
+  ["greg hulme","Game / OST"], ["game of themes","Game / OST"], ["watertower","Game / OST"],
+  ["tagelharpa","Mittelalter / Neofolk"], ["a tergo lupi","Mittelalter / Neofolk"],
+  ["dark folk","Mittelalter / Neofolk"], ["heilung","Mittelalter / Neofolk"],
+  ["wardruna","Mittelalter / Neofolk"], ["tabernis","Mittelalter / Neofolk"],
+  ["nordstille","Mittelalter / Neofolk"], ["vigundr","Mittelalter / Neofolk"],
+  ["vígundr","Mittelalter / Neofolk"], ["frosty","Mittelalter / Neofolk"], ["intihik","Mittelalter / Neofolk"],
+  ["elthin","Mittelalter / Neofolk"], ["frigg","Mittelalter / Neofolk"], ["otava yo","Mittelalter / Neofolk"],
+  ["filip holm","Mittelalter / Neofolk"], ["faun","Mittelalter / Neofolk"],
+  ["federkleid","Mittelalter / Neofolk"], ["ebanisteria","Mittelalter / Neofolk"],
+  ["helvegen","Mittelalter / Neofolk"], ["herr mannelig","Mittelalter / Neofolk"],
+  ["norupo","Mittelalter / Neofolk"], ["loddfafnir","Mittelalter / Neofolk"],
+  ["ragnarok","Mittelalter / Neofolk"], ["deloraine","Mittelalter / Neofolk"],
+  ["lyod","Mittelalter / Neofolk"], ["backbone of the urals","Mittelalter / Neofolk"],
+  ["an dro","Mittelalter / Neofolk"], ["douce dame jolie","Mittelalter / Neofolk"],
+  ["veraldar","Mittelalter / Neofolk"], ["craban ur dru","Mittelalter / Neofolk"],
+  ["samovar","Mittelalter / Neofolk"], ["korobushka","Mittelalter / Neofolk"],
+  ["der voghormia","Mittelalter / Neofolk"], ["black rainbows","Stoner / Doom"],
+  ["stone rebel","Stoner / Doom"], ["stonus","Stoner / Doom"], ["skelephant","Stoner / Doom"],
+  ["mars red sky","Stoner / Doom"], ["colour haze","Stoner / Doom"], ["cosmic desert","Stoner / Doom"],
+  ["i am the desert","Stoner / Doom"], ["deep purple","Stoner / Doom"], ["van halen","Stoner / Doom"],
+  ["mazzy star","Indie / Dream-Pop"], ["alt-j","Indie / Dream-Pop"], ["m83","Indie / Dream-Pop"],
+  ["empire of the sun","Indie / Dream-Pop"], ["capital cities","Indie / Dream-Pop"],
+  ["phantom planet","Indie / Dream-Pop"], ["djo -","Indie / Dream-Pop"], ["djo music","Indie / Dream-Pop"],
+  ["lana del rey","Indie / Dream-Pop"], ["keaton henson","Indie / Dream-Pop"],
+  ["low - lullaby","Indie / Dream-Pop"], ["dillon","Indie / Dream-Pop"],
+  ["ghostly kisses","Indie / Dream-Pop"], ["palace -","Indie / Dream-Pop"],
+  ["david kushner","Indie / Dream-Pop"], ["wolf larsen","Indie / Dream-Pop"],
+  ["beth hart","Indie / Dream-Pop"], ["daniel norgren","Indie / Dream-Pop"], ["allah-las","Indie / Dream-Pop"],
+  ["portishead","Indie / Dream-Pop"], ["yuuf","Indie / Dream-Pop"], ["zackery","Indie / Dream-Pop"],
+  ["foudeqush","Indie / Dream-Pop"], ["mateus asato","Indie / Dream-Pop"],
+  ["hermanos gutierrez","Indie / Dream-Pop"], ["hermanos gutiérrez","Indie / Dream-Pop"],
+  ["nouvelle vague","Indie / Dream-Pop"], ["ben howard","Indie / Dream-Pop"],
+  ["mansionair","Indie / Dream-Pop"], ["creed -","Indie / Dream-Pop"], ["tangerine dream","Ambient / IDM"],
+  ["vangelis","Ambient / IDM"], ["lisa gerrard","Ambient / IDM"], ["ludovico einaudi","Ambient / IDM"],
+  ["tony anderson","Ambient / IDM"], ["balmorhea","Ambient / IDM"], ["windows96","Ambient / IDM"],
+  ["aural palaces","Ambient / IDM"], ["alexander nakarada","Ambient / IDM"], ["cyberlife","Ambient / IDM"],
+  ["symphocat","Ambient / IDM"], ["long whale","Ambient / IDM"], ["sonna -","Ambient / IDM"],
+  ["steven lynn","Ambient / IDM"], ["estas tonne","Ambient / IDM"], ["estás tonné","Ambient / IDM"],
+  ["tchaikovsky","Ambient / IDM"], ["nutcracker","Ambient / IDM"], ["enya","Healing / Meditation"],
+  ["enigma","Healing / Meditation"], ["loreena mckennitt","Healing / Meditation"],
+  ["alexia chellun","Healing / Meditation"], ["oud","Healing / Meditation"],
+  ["zen garden","Healing / Meditation"], ["nao sogabe","Healing / Meditation"],
+  ["meditative","Healing / Meditation"], ["genesis -","Rock / Classic"], ["rammstein","Rock / Classic"],
+  ["kino","Rock / Classic"], ["группа крови","Rock / Classic"], ["ken hensley","Rock / Classic"],
+  ["phil collins","Rock / Classic"], ["deep purple official","Rock / Classic"],
+  ["udo lindenberg","Rock / Classic"], ["song des tages","Rock / Classic"],
+  ["stoll schieb den blues","Rock / Classic"], ["depeche mode","Pop / Synthwave"],
+  ["bee gees","Pop / Synthwave"], ["beegees","Pop / Synthwave"], ["empire of the","Pop / Synthwave"],
+  ["gigi d","Pop / Synthwave"], ["capital cities","Pop / Synthwave"], ["neuneralm","Volksmusik / Schlager"],
+  ["d'neuneralm","Volksmusik / Schlager"], ["herbert roth","Volksmusik / Schlager"],
+  ["rennsteiglied","Volksmusik / Schlager"], ["zottlmusi","Volksmusik / Schlager"],
+  ["goiserer","Volksmusik / Schlager"], ["udo jurgens","Volksmusik / Schlager"],
+  ["udo jürgens","Volksmusik / Schlager"], ["griechischer wein","Volksmusik / Schlager"],
+  ["isi glück","Volksmusik / Schlager"], ["isi gluck","Volksmusik / Schlager"],
+  ["heimatländer","Volksmusik / Schlager"], ["heimatlander","Volksmusik / Schlager"],
+  ["viergesang","Volksmusik / Schlager"], ["weihnacht","Volksmusik / Schlager"],
+  ["trio wahnsinn","Volksmusik / Schlager"], ["bettina wegner","Satire / Liedermacher"],
+  ["witthuser","Satire / Liedermacher"], ["witthüser","Satire / Liedermacher"],
+  ["westrupp","Satire / Liedermacher"], ["b-migos","Satire / Liedermacher"], ["iltis","Satire / Liedermacher"],
+  ["feuerwehr statt","Satire / Liedermacher"], ["anthar kharana","Organic / Ethno"],
+  ["inti-illimani","Organic / Ethno"], ["rising appalachia","Organic / Ethno"],
+  ["la piragua","Organic / Ethno"], ["umoja","Organic / Ethno"], ["canto ancestral","Organic / Ethno"],
+  ["bedouins","Organic / Ethno"], ["jonna jinton","Organic / Ethno"], ["anawak","Organic / Ethno"],
+  ["espiritu del viento","Organic / Ethno"], ["espíritu del viento","Organic / Ethno"],
+  ["shaolin afronauts","Organic / Ethno"], ["yin yin","Organic / Ethno"], ["yīn yīn","Organic / Ethno"],
+  [" angela viana","Organic / Ethno"], ["ângela viana","Organic / Ethno"],
 ];
 function classify(title, channel){
   const h = norm((title||"") + " " + (channel||""));
@@ -843,7 +946,7 @@ async function fetchMeta(url){
    STATE
    ==================================================================== */
 const LS_KEY = "temple_library_v1";
-const SEED_GENRES = ["Goa / Psytrance", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Techno / House", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Rock / Classic", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Unsortiert"];
+const SEED_GENRES = ["Goa / Psytrance", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
 
 let LIB = { version:1, updated:null, genres:[] };  // working copy
 let FLAT = [];          // flattened, filtered playable list (current view order)
@@ -1034,6 +1137,16 @@ function reflectPlay(){
   $("#ic-pause").style.display = isPlaying ? "block":"none";
   $("#btn-play").setAttribute("aria-label", isPlaying?"Pause":"Abspielen");
   $$(".row.is-active").forEach(r=> r.classList.toggle("playing", isPlaying));
+  $("#player").classList.toggle("playing", isPlaying);
+}
+function buildViz(){
+  const v = $("#viz"); if(!v || v.children.length) return;
+  for (let i=0;i<20;i++){
+    const b=document.createElement("span");
+    b.style.animationDuration = (0.5 + Math.random()*0.75).toFixed(2)+"s";
+    b.style.animationDelay = (-Math.random()*0.9).toFixed(2)+"s";
+    v.appendChild(b);
+  }
 }
 function togglePlay(){
   if (!curId){ if (FLAT.length) playUid(uid(FLAT[0].t)); return; }
@@ -1311,6 +1424,7 @@ function routeHash(){ if (location.hash==="#"+ADMIN_KEY) openAdmin(); }
 /* ---------- boot ---------- */
 async function boot(){
   $("#year").textContent = new Date().getFullYear();
+  buildViz();
   await loadLibrary();
   bind();
   render();
