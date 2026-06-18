@@ -410,8 +410,8 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
     <div class="hero__meta">
       <span><b id="m-tracks">0</b> Tracks</span>
       <span><b id="m-genres">0</b> Genres</span>
-      <span>Audio-first · YouTube</span>
-      <span>Underground</span>
+      <span>≈ <b id="m-hours">0</b> Std</span>
+      <span>Audio-first · YT + SoundCloud</span>
     </div>
   </div>
 </section>
@@ -567,21 +567,24 @@ const fmt = t => { t=Math.max(0,Math.floor(t||0)); const m=Math.floor(t/60), s=t
 /* ---------- genre classifier (heuristik, kein API-key) ---------- */
 /* Reihenfolge = Priorität bei Gleichstand. Stichwörter frei erweiterbar. */
 const GENRE_RULES = [
-  ["postrock","Rock / Classic"], ["post-rock","Rock / Classic"], ["lorne balfe","Game / OST"],
-  ["book of life","Hip-Hop"], ["give me the money","Roots Reggae"], ["martin campbell","Roots Reggae"],
-  ["keelo","Forest / Darkpsy"], ["hi-tech","Hi-Tech"], ["hitech","Hi-Tech"], ["hi tech","Hi-Tech"],
-  ["henrique camacho","Hi-Tech"], ["psykart","Hi-Tech"], ["maramba","Hi-Tech"], ["marambá","Hi-Tech"],
-  ["retro future trance","Hi-Tech"], ["fake drop 180bpm","Hi-Tech"], ["200 bpm","Hi-Tech"],
-  ["progressive psytrance","Progressive Psy"], ["progressive psy","Progressive Psy"],
-  ["prog psy","Progressive Psy"], ["progressive trance","Progressive Psy"],
-  ["progressive mix","Progressive Psy"], ["full-on","Full-On"], ["fullon","Full-On"], ["full on","Full-On"],
-  ["forest psy","Forest / Darkpsy"], ["forestpsy","Forest / Darkpsy"], ["darkpsy","Forest / Darkpsy"],
-  ["dark psy","Forest / Darkpsy"], ["hi-tech forest","Forest / Darkpsy"], ["psycore","Forest / Darkpsy"],
-  ["nuages","Ambient / IDM"], ["n u a g e s","Ambient / IDM"], ["kachu","Freetekno / Tekno"],
-  ["kachu2k","Freetekno / Tekno"], ["city am fenster","Volksmusik / Schlager"],
-  ["am fenster","Volksmusik / Schlager"], ["drum and bass","Drum & Bass"], ["drum & bass","Drum & Bass"],
-  ["dnb","Drum & Bass"], ["neurofunk","Drum & Bass"], ["liquid dnb","Drum & Bass"], ["jump up","Drum & Bass"],
-  ["d&b","Drum & Bass"], ["driftwood holly","Akustik / Folk"], ["the comet is coming","Downtempo / Trip-Hop"],
+  ["tame impala","Psychedelic Rock"], ["pink floyd","Psychedelic Rock"], ["liquify","Psychedelic Rock"],
+  ["sleeping pandora","Psychedelic Rock"], ["dryante","Mittelalter / Neofolk"], ["macky gee","Drum & Bass"],
+  ["corntekk","Freetekno / Tekno"], ["postrock","Rock / Classic"], ["post-rock","Rock / Classic"],
+  ["lorne balfe","Game / OST"], ["book of life","Hip-Hop"], ["give me the money","Roots Reggae"],
+  ["martin campbell","Roots Reggae"], ["keelo","Forest / Darkpsy"], ["hi-tech","Hi-Tech"],
+  ["hitech","Hi-Tech"], ["hi tech","Hi-Tech"], ["henrique camacho","Hi-Tech"], ["psykart","Hi-Tech"],
+  ["maramba","Hi-Tech"], ["marambá","Hi-Tech"], ["retro future trance","Hi-Tech"],
+  ["fake drop 180bpm","Hi-Tech"], ["200 bpm","Hi-Tech"], ["progressive psytrance","Progressive Psy"],
+  ["progressive psy","Progressive Psy"], ["prog psy","Progressive Psy"],
+  ["progressive trance","Progressive Psy"], ["progressive mix","Progressive Psy"], ["full-on","Full-On"],
+  ["fullon","Full-On"], ["full on","Full-On"], ["forest psy","Forest / Darkpsy"],
+  ["forestpsy","Forest / Darkpsy"], ["darkpsy","Forest / Darkpsy"], ["dark psy","Forest / Darkpsy"],
+  ["hi-tech forest","Forest / Darkpsy"], ["psycore","Forest / Darkpsy"], ["nuages","Ambient / IDM"],
+  ["n u a g e s","Ambient / IDM"], ["kachu","Freetekno / Tekno"], ["kachu2k","Freetekno / Tekno"],
+  ["city am fenster","Volksmusik / Schlager"], ["am fenster","Volksmusik / Schlager"],
+  ["drum and bass","Drum & Bass"], ["drum & bass","Drum & Bass"], ["dnb","Drum & Bass"],
+  ["neurofunk","Drum & Bass"], ["liquid dnb","Drum & Bass"], ["jump up","Drum & Bass"], ["d&b","Drum & Bass"],
+  ["driftwood holly","Akustik / Folk"], ["the comet is coming","Downtempo / Trip-Hop"],
   ["comet is coming","Downtempo / Trip-Hop"], ["forest swords","Downtempo / Trip-Hop"],
   ["neelix","Goa / Psytrance"], ["unlogix","Goa / Psytrance"], ["daso","Techno / House"],
   ["hotel pools","Pop / Synthwave"], ["oddling","Pop / Synthwave"], ["ivoxygen","Pop / Synthwave"],
@@ -1028,6 +1031,7 @@ let shuffle = false, repeat = false;
 let volume = 100, muted = false;
 let ytApiReady = false, ytReady = false, player = null, ticker = null;
 let scApiReady = false, scReady = false, scWidget = null, scPos = 0;   // SoundCloud-Engine
+let ytLoading = false, scLoading = false;   // Player-APIs erst bei Bedarf laden
 let curSource = "youtube", pending = null;
 
 function uid(t){ return (t.source||"youtube")+":"+(t.kind||"v")+":"+t.id; }
@@ -1119,6 +1123,8 @@ function render(){
   }
   $("#m-tracks").textContent = total;
   $("#m-genres").textContent = LIB.genres.filter(g=>g.tracks.length).length;
+  let secs=0; LIB.genres.forEach(g=>g.tracks.forEach(t=> secs += t.dur || 300));  // echte Länge, fehlende ~5min geschätzt
+  $("#m-hours").textContent = Math.round(secs/3600);
 }
 
 /* ====================================================================
@@ -1163,7 +1169,7 @@ function buildPlayer(e){
 }
 function playYT(e){
   if (scWidget){ try{ scWidget.pause(); }catch(_){} }
-  if (!ytApiReady){ pending = e; return; }
+  if (!ytApiReady){ if(!ytLoading){ ytLoading=true; loadYTApi(); } pending = e; return; }
   if (!player){ buildPlayer(e); return; }
   if (!ytReady){ pending = e; return; }
   if (e.t.kind === "playlist") player.loadPlaylist({ list:e.t.id, listType:"playlist", index:0 });
@@ -1181,7 +1187,7 @@ function onState(ev){
 function scUrl(t){ return t.url || ("https://soundcloud.com/"+t.id); }
 function playSC(e){
   if (player && ytReady){ try{ player.pauseVideo(); }catch(_){} }
-  if (!scApiReady){ pending = e; return; }
+  if (!scApiReady){ if(!scLoading){ scLoading=true; loadSCApi(); } pending = e; return; }
   if (!scWidget){ buildSC(scUrl(e.t)); return; }
   scWidget.load(scUrl(e.t), { auto_play:true, visual:false, callback:()=>{ scReady=true; applyVolume(); startTicker(); } });
 }
@@ -1509,9 +1515,7 @@ async function boot(){
   await loadLibrary();
   bind();
   render();
-  loadYTApi();
-  loadSCApi();
-  routeHash();
+  routeHash();   // Player-APIs (YT/SC) werden erst beim ersten Play geladen → schnellerer Initial-Load
 }
 boot();
 })();
