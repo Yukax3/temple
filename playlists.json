@@ -518,14 +518,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "QFxvGZZzFXM",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Music Of Sacred Rainforests With Iyakuh: Ocoyo [Ambient Nature Sounds | Atmospheric | Organic Chill]",
-          "artist": "Shivelight and iyakuh",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "6LUZ4_zY12Y",
           "source": "youtube",
           "kind": "video",
@@ -534,27 +526,11 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "bwyvnP1s8mg",
-          "source": "youtube",
-          "kind": "video",
-          "title": "EddiBell - Medisin (Album Mix) [Organic Downtempo | Folktronica | Rainforest Rave]",
-          "artist": "Shivelight",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "xyXUCCqSk-Q",
           "source": "youtube",
           "kind": "video",
           "title": "Forest Of Painted Shadows ~ Chill, Organic Downtempo, Folktronica, Psychedelic, Boom Bap (Mix)",
           "artist": "Lost Trances",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "PwkAZOqgM5M",
-          "source": "youtube",
-          "kind": "video",
-          "title": "AWARË Live at GOAT Community - Portugal 2025",
-          "artist": "AWARË",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -870,15 +846,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "346265101",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/teksa/teksa-haunted-forest",
-          "title": "Teksa - Haunted Forest [Tekno Trip 04]",
-          "artist": "Teksa",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "1663716078",
           "source": "soundcloud",
           "kind": "track",
@@ -1041,15 +1008,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "198357221",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/goazwergliiii/crazy-astronaut-the-realm-of",
-          "title": "Crazy Astronaut - The Realm of the Invisible",
-          "artist": "Goazwergliii ॐ",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "258834253",
           "source": "soundcloud",
           "kind": "track",
@@ -1154,14 +1112,6 @@
       "name": "Hi-Tech",
       "tracks": [
         {
-          "id": "7KsMyYlsxWI",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Book of Life",
-          "artist": "Hi Tech - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "HJi9-sRDDEY",
           "source": "youtube",
           "kind": "video",
@@ -1191,14 +1141,6 @@
           "kind": "video",
           "title": "Henrique Camacho - Maharani Hi-Tech [FAKE DROP 180BPM]",
           "artist": "Henrique Camacho",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "gm5fsLz951w",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Give Me the Money",
-          "artist": "Martin Campbell & Hi Tech Roots Dynamics - Topic",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -1422,6 +1364,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "95434212",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/gukick/loud-small-talk-ozora-edit",
+          "title": "LOUD   Small Talk (Ozora Edit)",
+          "artist": "gukick",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "158357004",
           "source": "soundcloud",
           "kind": "track",
@@ -1455,6 +1406,15 @@
           "url": "https://soundcloud.com/oxidaksi/oxidaksi-volcano",
           "title": "Oxidaksi - Volcano (Namo Records)",
           "artist": "OxiDaksi",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "99290644",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/kobiblastoyz/loud-small-talk-blastooyzz-remix",
+          "title": "Loud - Small Talk (Blastoyz Remix)",
+          "artist": "Blastoyz",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -1629,6 +1589,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "190765777",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/vascopsy/vasco-dino-20",
+          "title": "Vasco - Dino 2.0 (Soon @\"V.A. Shamanism \" [Popol Vuh Records])",
+          "artist": ".Vasco.",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "184632533",
           "source": "soundcloud",
           "kind": "track",
@@ -1752,6 +1721,15 @@
           "url": "https://soundcloud.com/holasoynetobaby/6-mandragora-groovaholik-carouselloriginal-mix",
           "title": "Mandragora x Groovaholik - Carousel",
           "artist": "DJ MANDRAGORA",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "198357221",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/goazwergliiii/crazy-astronaut-the-realm-of",
+          "title": "Crazy Astronaut - The Realm of the Invisible",
+          "artist": "Goazwergliii ॐ",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -1941,6 +1919,15 @@
           "url": "https://soundcloud.com/taohrkv/tao-h-happy-blues-preview",
           "title": "Tao H - Happy Blues (preview)",
           "artist": "Tao h",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "235628161",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/vagusmusic/ultravoice-vs-technodrom-vs-vagus-on-board",
+          "title": "Ultravoice Vs Technodrom Vs VAGUS  - On board",
+          "artist": "VAGUS",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -2331,6 +2318,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "273815922",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/ghostrider_mag/ghost-rider-everlasting-teaser",
+          "title": "Ghost Rider - Everlasting",
+          "artist": "Ghost Rider",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "285845534",
           "source": "soundcloud",
           "kind": "track",
@@ -2427,6 +2423,15 @@
           "url": "https://soundcloud.com/freedomfighters/pixel-freedom-fighters-sem-is-different",
           "title": "Pixel & Freedom Fighters - SEM Is Different",
           "artist": "Freedøm Fighters",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "278933108",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/astateoftrance/chris-schweizer-ben-nicky-the-switch-out-now",
+          "title": "Chris Schweizer & Ben Nicky - The Switch [OUT NOW]",
+          "artist": "A State of Trance",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -2571,6 +2576,15 @@
           "url": "https://soundcloud.com/ghostrider_mag/koan-uncloak-ghost-rider-remix-out-6-october",
           "title": "Koan - Uncloak (Ghost Rider Remix)",
           "artist": "Ghost Rider",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "285125483",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/harrypotar/totoroms",
+          "title": "Totoroms",
+          "artist": "harry potar",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -3483,6 +3497,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "326648747",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/insomniacrecords/alan-walker-alex-skrindo-sky",
+          "title": "Alan Walker & Alex Skrindo - Sky",
+          "artist": "Insomniac Records",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "54858303",
           "source": "soundcloud",
           "kind": "track",
@@ -3551,6 +3574,15 @@
           "kind": "track",
           "url": "https://soundcloud.com/gen-ohm/gen-ohm-virustech-galaxy-core",
           "title": "Gen-Ohm & VirusTech - Galaxy Core",
+          "artist": "Gen-Ohm",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "255555953",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/gen-ohm/gen-ohm-rocket-8",
+          "title": "Gen-Ohm - Rocket #8",
           "artist": "Gen-Ohm",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -3732,6 +3764,15 @@
           "url": "https://soundcloud.com/gen-ohm/gen-ohm-virustech-orbitone",
           "title": "Gen-Ohm & VirusTech - Orbitone",
           "artist": "Gen-Ohm",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "324122713",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/risingdust/ace-ventura-vs-rocky-dr-lupo-rising-dust-remix-sample",
+          "title": "Ace Ventura Vs Rocky - Dr Lupo - Rising Dust Remix (Full Version)",
+          "artist": "Rising Dust",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -4194,6 +4235,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "328073274",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/4weekend/loud-small-talk-4weekend-remix-free-download",
+          "title": "LOUD - Small Talk (4weekend Remix)  [Free Download]",
+          "artist": "4weekend",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "76009062",
           "source": "soundcloud",
           "kind": "track",
@@ -4254,6 +4304,15 @@
           "url": "https://soundcloud.com/montti/montti-reaper",
           "title": "Montti - Reaper",
           "artist": "MONTTI",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "109466128",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/biokinetixofficial/biokinetix-black-sheep-1",
+          "title": "Biokinetix - Black Sheep Technology",
+          "artist": "BIOKINETIX (Official)",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -4767,6 +4826,15 @@
           "url": "https://soundcloud.com/oficialoz/boris-brejcha-gravity-oz-rmx-master-2",
           "title": "Boris Brejcha Gravity ( Oz Bootleg )- FULL VERSION  140 BPM",
           "artist": "Oz",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "1929747887",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/blotter_tab/blotter-acid-rocker-free-download",
+          "title": "Blotter - Acid Rocker (FREE DOWNLOAD)",
+          "artist": "Blotter",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -6289,15 +6357,6 @@
           "title": "Refraction 1.33",
           "artist": "Carbon Based Lifeforms",
           "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "287573109",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/wearegraves/graves-king-tadashi-falkor-the-luck-dragon",
-          "title": "graves & Tadashi - Falkor the Luck Dragon",
-          "artist": "graves",
-          "added": "2026-06-17T00:00:00Z"
         }
       ]
     },
@@ -6609,19 +6668,19 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "QFxvGZZzFXM",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Music Of Sacred Rainforests With Iyakuh: Ocoyo [Ambient Nature Sounds | Atmospheric | Organic Chill]",
+          "artist": "Shivelight and iyakuh",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "MbW8YIv28wg",
           "source": "youtube",
           "kind": "video",
           "title": "Grounding Meditation (1111 Hz) | 1 hour handpan music | Malte Marten",
           "artist": "Malte Marten",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "Ea6gZmli16w",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Dan Caine - Solace [Full Album]",
-          "artist": "Worldhaspostrock",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -7160,6 +7219,22 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "jesj2vtWa5k",
+          "source": "youtube",
+          "kind": "video",
+          "title": "STEREOMANTRA - Waterfall",
+          "artist": "Savvas Kalt",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "srLD_nbu0k8",
+          "source": "youtube",
+          "kind": "video",
+          "title": "MYSTIC CROCK & DENSE - Refuge (feat. Spinney Lainey)",
+          "artist": "Savvas Kalt",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "48vSDtYrIeU",
           "source": "youtube",
           "kind": "video",
@@ -7456,30 +7531,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "RAC9IAnIqmk",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Grey Cloud Lullaby",
-          "artist": "Slow Meadow",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "dAhQQtJeceE",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Distracted by Clouds",
-          "artist": "Aukai",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "PSk26AMb2h0",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Distracted by Clouds (Ben Lukas Boysen Remix)",
-          "artist": "Aukai",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "swD3ezNnBGg",
           "source": "youtube",
           "kind": "video",
@@ -7557,49 +7608,6 @@
           "kind": "video",
           "title": "Let's Go On",
           "artist": "Ram Dass",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "shBjMLweNvg",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Clouds Parting",
-          "artist": "sonder the africanime",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "ZpnVEC1_HZo",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Silence Is Loud",
-          "artist": "Nia Archives",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "95434212",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/gukick/loud-small-talk-ozora-edit",
-          "title": "LOUD   Small Talk (Ozora Edit)",
-          "artist": "gukick",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "99290644",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/kobiblastoyz/loud-small-talk-blastooyzz-remix",
-          "title": "Loud - Small Talk (Blastoyz Remix)",
-          "artist": "Blastoyz",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "328073274",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/4weekend/loud-small-talk-4weekend-remix-free-download",
-          "title": "LOUD - Small Talk (4weekend Remix)  [Free Download]",
-          "artist": "4weekend",
           "added": "2026-06-17T00:00:00Z"
         }
       ]
@@ -8064,6 +8072,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "bwyvnP1s8mg",
+          "source": "youtube",
+          "kind": "video",
+          "title": "EddiBell - Medisin (Album Mix) [Organic Downtempo | Folktronica | Rainforest Rave]",
+          "artist": "Shivelight",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "bHVIP-5LgNo",
           "source": "youtube",
           "kind": "video",
@@ -8189,14 +8205,6 @@
           "kind": "video",
           "title": "Vera Anja - Chirripó (NATURRITU Remix) [Organic Downtempo / Medicine Music]",
           "artist": "N Λ T U R R I T U",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "tLdKxI-JswQ",
-          "source": "youtube",
-          "kind": "video",
-          "title": "The Threads That Bind",
-          "artist": "Lorne Balfe",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -9912,6 +9920,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "320212277",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/cricky-mccann/we-control-the-grapevine",
+          "title": "We Control The Grapevine (Cricky McCann Mashup)",
+          "artist": "CRICKY MCCANN",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "2837870",
           "source": "soundcloud",
           "kind": "track",
@@ -9936,6 +9953,15 @@
           "url": "https://soundcloud.com/docus1/dominik-eulberg-opel-tantra",
           "title": "Dominik Eulberg - Opel Tantra (Original Mix)",
           "artist": "Docus1",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "183578916",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/anteperry/funf-sterne-deluxe-die-leudeante-perrys-chefrocker-remixfsd-records",
+          "title": "FÜNF STERNE DELUXE - Die Leude(Ante Perry's Chefrocker Remix)(FSD Records)",
+          "artist": "Ante Perry",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -10308,15 +10334,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "235628161",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/vagusmusic/ultravoice-vs-technodrom-vs-vagus-on-board",
-          "title": "Ultravoice Vs Technodrom Vs VAGUS  - On board",
-          "artist": "VAGUS",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "251074444",
           "source": "soundcloud",
           "kind": "track",
@@ -10539,15 +10556,6 @@
           "url": "https://soundcloud.com/ibogarecords/off-limits-alchemy-original",
           "title": "Off Limits - Alchemy (Original mix)",
           "artist": "IbogaRecords",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "109466128",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/biokinetixofficial/biokinetix-black-sheep-1",
-          "title": "Biokinetix - Black Sheep Technology",
-          "artist": "BIOKINETIX (Official)",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -11717,6 +11725,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "S44snRFBkWI",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Hooked",
+          "artist": "KovenUKMusic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "DDSi1luYpFg",
           "source": "youtube",
           "kind": "video",
@@ -12053,6 +12069,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "ZpnVEC1_HZo",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Silence Is Loud",
+          "artist": "Nia Archives",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "8o5Lu3YhuwQ",
           "source": "youtube",
           "kind": "video",
@@ -12074,6 +12098,14 @@
           "kind": "video",
           "title": "Gals",
           "artist": "Isaac Maya - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "mY2Qy7E3wUQ",
+          "source": "youtube",
+          "kind": "video",
+          "title": "SLEEP TONIGHT (THIS IS THE LIFE) (Tsuki Remix)",
+          "artist": "SwitchDisco",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -12437,11 +12469,27 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "XqUFq49Rthg",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Threshold",
+          "artist": "Iwakura",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "fltwy_4fMWA",
           "source": "youtube",
           "kind": "video",
           "title": "Lore of Regression",
           "artist": "Monrroe - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "dhkdGtDk_zY",
+          "source": "youtube",
+          "kind": "video",
+          "title": "System Check (DJ Limited Remix)",
+          "artist": "DJ Brockie - Topic",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -12461,6 +12509,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "7Rdx9huH_jo",
+          "source": "youtube",
+          "kind": "video",
+          "title": "King Rocka",
+          "artist": "Vinyl Junkie - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "7XJVqzqTnXM",
           "source": "youtube",
           "kind": "video",
@@ -12474,6 +12530,14 @@
           "kind": "video",
           "title": "Attention (Drum n Bass VIP Mix)",
           "artist": "Noise Cans",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "lbTvXNdv284",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Rocker",
+          "artist": "Rendah - Topic",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -14285,6 +14349,22 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "_0wUqRYTDDQ",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Orbit",
+          "artist": "KovenUKMusic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "f21NTwWYkMw",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Chase The Sun",
+          "artist": "KovenUKMusic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "GZ3EHdGE3dY",
           "source": "youtube",
           "kind": "video",
@@ -14721,14 +14801,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "S44snRFBkWI",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Hooked",
-          "artist": "KovenUKMusic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "H5iYU9LIgxI",
           "source": "youtube",
           "kind": "video",
@@ -14926,22 +14998,6 @@
           "kind": "video",
           "title": "Touch",
           "artist": "Hybrid Minds",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "_0wUqRYTDDQ",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Orbit",
-          "artist": "KovenUKMusic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "f21NTwWYkMw",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Chase The Sun",
-          "artist": "KovenUKMusic",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -15609,6 +15665,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "118807588",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/yael-yowii/yowii-please-sing",
+          "title": "Yowii - Please sing (UndergroundTekno RaggatekPower04)",
+          "artist": "Yowii",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "136882344",
           "source": "soundcloud",
           "kind": "track",
@@ -16014,6 +16079,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "346265101",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/teksa/teksa-haunted-forest",
+          "title": "Teksa - Haunted Forest [Tekno Trip 04]",
+          "artist": "Teksa",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "260773991",
           "source": "soundcloud",
           "kind": "track",
@@ -16176,6 +16250,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "195148075",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/skrytekno/skry-soulstorm-raggatek",
+          "title": "SKRY - Raggastorm (Raggatek Power 07)",
+          "artist": "SKRY",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "266100492",
           "source": "soundcloud",
           "kind": "track",
@@ -16335,6 +16418,15 @@
           "url": "https://soundcloud.com/teilekind/deep-tribe-no-control-soundconcept",
           "title": "Deep Tribe (no Control Soundconcept)",
           "artist": "TeileKinD",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "145199538",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/hozinotik/hozinotik-soulstorm-raggatek",
+          "title": "Hozinotik - Soulstorm (Raggatek Bootleg)",
+          "artist": "Hozinotik",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -16632,6 +16724,15 @@
           "url": "https://soundcloud.com/shaneleigh/lethal-poison-for-the-system",
           "title": "Lethal Poison For The System",
           "artist": "Spinnin' n grinnin'",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "165459913",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/stefanie-kaemper/raggatekk-i-love-it-2",
+          "title": "Raggatekk... i  love it",
+          "artist": "Stefanie Kaemper",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -17019,6 +17120,15 @@
           "url": "https://soundcloud.com/kiwizmusic/free-to-feel-good",
           "title": "Free To Feel Good",
           "artist": "Kiwiz",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "4700900",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/back2roots/b2r-insomnia",
+          "title": "insomnia",
+          "artist": "Back2Roots",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -17913,6 +18023,15 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "2273207054",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/akou_shz/akou-darkness-from-the-world-1",
+          "title": "AKOU - Darkness From The World [Mantra03]",
+          "artist": "AKOU",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "2231381306",
           "source": "soundcloud",
           "kind": "track",
@@ -18034,14 +18153,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "zy9AyCqlLEg",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Telefonterroristen",
-          "artist": "Trabireiter - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "126005880",
           "source": "soundcloud",
           "kind": "track",
@@ -18066,15 +18177,6 @@
           "url": "https://soundcloud.com/tvph/oz-tvphmon-petit-poney",
           "title": "Mon Petit Poney (mix pauper to the people)/ Oz TVPH",
           "artist": "Trop vieux pour le hardcore",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "581218497",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/corntekk/corntekk23-afterlifeterror",
-          "title": "Corntekk - AfterlifeTerror",
-          "artist": "cσяитєкк Cottesound",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -18169,6 +18271,14 @@
           "kind": "video",
           "title": "On Jah Solid Rock",
           "artist": "Israel Vibration - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "gm5fsLz951w",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Give Me the Money",
+          "artist": "Martin Campbell & Hi Tech Roots Dynamics - Topic",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -19010,42 +19120,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "118807588",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/yael-yowii/yowii-please-sing",
-          "title": "Yowii - Please sing (UndergroundTekno RaggatekPower04)",
-          "artist": "Yowii",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "195148075",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/skrytekno/skry-soulstorm-raggatek",
-          "title": "SKRY - Raggastorm (Raggatek Power 07)",
-          "artist": "SKRY",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "145199538",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/hozinotik/hozinotik-soulstorm-raggatek",
-          "title": "Hozinotik - Soulstorm (Raggatek Bootleg)",
-          "artist": "Hozinotik",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "165459913",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/stefanie-kaemper/raggatekk-i-love-it-2",
-          "title": "Raggatekk... i  love it",
-          "artist": "Stefanie Kaemper",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "131412273",
           "source": "soundcloud",
           "kind": "track",
@@ -19284,14 +19358,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "S4e_ZzYLlC8",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Tame Impala - Let It Happen (Doomer Wave) (slowed + pitched)",
-          "artist": "JustMyFavStrangeMusic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "930pMyHe5h0",
           "source": "youtube",
           "kind": "video",
@@ -19380,14 +19446,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "La5QW6XrjJE",
-          "source": "youtube",
-          "kind": "video",
-          "title": "AYTHIS - CELESTIAL EXILE [2024] + LOST LIGHTHOUSE [2024] w lyrics [Ethereal, Doomgaze, Neoclassical]",
-          "artist": "Dark_Atmospheric",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "rqsZaFB6kOI",
           "source": "youtube",
           "kind": "video",
@@ -19401,14 +19459,6 @@
           "kind": "video",
           "title": "Black Sabbath - Planet Caravan",
           "artist": "F G.",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "tJVoNc5ibeo",
-          "source": "youtube",
-          "kind": "video",
-          "title": "DUNE PILOT - Magnetic (Full Album 2023)",
-          "artist": "666MrDoom",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -20285,6 +20335,14 @@
           "kind": "video",
           "title": "Human Tetris - Memorabilia (Album)",
           "artist": "creature",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "S4e_ZzYLlC8",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Tame Impala - Let It Happen (Doomer Wave) (slowed + pitched)",
+          "artist": "JustMyFavStrangeMusic",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -21380,11 +21438,11 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "srLD_nbu0k8",
+          "id": "Ea6gZmli16w",
           "source": "youtube",
           "kind": "video",
-          "title": "MYSTIC CROCK & DENSE - Refuge (feat. Spinney Lainey)",
-          "artist": "Savvas Kalt",
+          "title": "Dan Caine - Solace [Full Album]",
+          "artist": "Worldhaspostrock",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -21409,14 +21467,6 @@
           "kind": "video",
           "title": "Ken Hensley - Lady in Black",
           "artist": "Fjumse2001",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "DB8-kZwexS0",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Kiki Rockwell - Hejo, Spann Den Wagen An",
-          "artist": "Kiki Rockwell",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -21484,22 +21534,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "8oqu7yhHAuo",
-          "source": "youtube",
-          "kind": "video",
-          "title": "The Witcher 3 - Skellige Combat Theme (Percival - Jomsborg) - Cover by Dryante ft. Elza Shtolz",
-          "artist": "Dryante Zan",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "BR18eEPT_Nk",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Tagelharpa - Hunt or Be Hunted (The Witcher 3 - Wild Hunt)",
-          "artist": "Ebanisteria Musicale C.M. Ferrari",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "Ccs2rt0oSzQ",
           "source": "youtube",
           "kind": "video",
@@ -21540,34 +21574,10 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "gfIFUdFJdoM",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Praise The Lord (Da Shine)",
-          "artist": "ASAPROCKYUPTOWN",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "6xyNjZzrMq0",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Everyday",
-          "artist": "ASAPROCKYUPTOWN",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "VhAmLubwp_g",
           "source": "youtube",
           "kind": "video",
           "title": "Trabireiter Rock and Roll",
-          "artist": "Trabireiter - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "wQohJlaNiXc",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Radio Brocken",
           "artist": "Trabireiter - Topic",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -21580,52 +21590,11 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "mY2Qy7E3wUQ",
-          "source": "youtube",
-          "kind": "video",
-          "title": "SLEEP TONIGHT (THIS IS THE LIFE) (Tsuki Remix)",
-          "artist": "SwitchDisco",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "dhkdGtDk_zY",
-          "source": "youtube",
-          "kind": "video",
-          "title": "System Check (DJ Limited Remix)",
-          "artist": "DJ Brockie - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "7Rdx9huH_jo",
-          "source": "youtube",
-          "kind": "video",
-          "title": "King Rocka",
-          "artist": "Vinyl Junkie - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "lbTvXNdv284",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Rocker",
-          "artist": "Rendah - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "VafJgV4DvOM",
           "source": "youtube",
           "kind": "video",
           "title": "Metal & Blood",
           "artist": "Drumsound - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "183578916",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/anteperry/funf-sterne-deluxe-die-leudeante-perrys-chefrocker-remixfsd-records",
-          "title": "FÜNF STERNE DELUXE - Die Leude(Ante Perry's Chefrocker Remix)(FSD Records)",
-          "artist": "Ante Perry",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -21680,51 +21649,6 @@
           "url": "https://soundcloud.com/montti/rocknrolla-free-download",
           "title": "Rock'n'Rolla",
           "artist": "MONTTI",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "278933108",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/astateoftrance/chris-schweizer-ben-nicky-the-switch-out-now",
-          "title": "Chris Schweizer & Ben Nicky - The Switch [OUT NOW]",
-          "artist": "A State of Trance",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "285125483",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/harrypotar/totoroms",
-          "title": "Totoroms",
-          "artist": "harry potar",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "255555953",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/gen-ohm/gen-ohm-rocket-8",
-          "title": "Gen-Ohm - Rocket #8",
-          "artist": "Gen-Ohm",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "324122713",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/risingdust/ace-ventura-vs-rocky-dr-lupo-rising-dust-remix-sample",
-          "title": "Ace Ventura Vs Rocky - Dr Lupo - Rising Dust Remix (Full Version)",
-          "artist": "Rising Dust",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "1929747887",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/blotter_tab/blotter-acid-rocker-free-download",
-          "title": "Blotter - Acid Rocker (FREE DOWNLOAD)",
-          "artist": "Blotter",
           "added": "2026-06-17T00:00:00Z"
         }
       ]
@@ -22021,6 +21945,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "zy9AyCqlLEg",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Telefonterroristen",
+          "artist": "Trabireiter - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "xsoOlTjy72s",
           "source": "youtube",
           "kind": "video",
@@ -22137,6 +22069,14 @@
           "source": "youtube",
           "kind": "video",
           "title": "Dar Baul",
+          "artist": "Trabireiter - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "wQohJlaNiXc",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Radio Brocken",
           "artist": "Trabireiter - Topic",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -22346,14 +22286,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "rt1lJ_7POHQ",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Everlasting",
-          "artist": "Malte Marten - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "XpqqjU7u5Yc",
           "source": "youtube",
           "kind": "video",
@@ -22394,22 +22326,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "xQ09KRW9GA4",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Trusting the Process (1111 Hz)",
-          "artist": "Malte Marten - Topic",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "m8zZi5KFOKY",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Everlasting Expanse",
-          "artist": "QuixoticZ",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "6m_2bD8WQ_E",
           "source": "youtube",
           "kind": "video",
@@ -22442,21 +22358,20 @@
           "title": "oDDling & Hotel Pools - Parallel",
           "artist": "Hotel Pools",
           "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "273815922",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/ghostrider_mag/ghost-rider-everlasting-teaser",
-          "title": "Ghost Rider - Everlasting",
-          "artist": "Ghost Rider",
-          "added": "2026-06-17T00:00:00Z"
         }
       ]
     },
     {
       "name": "Hip-Hop",
       "tracks": [
+        {
+          "id": "7KsMyYlsxWI",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Book of Life",
+          "artist": "Hi Tech - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
         {
           "id": "6TWFPmZAne0",
           "source": "youtube",
@@ -23000,14 +22915,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "jesj2vtWa5k",
-          "source": "youtube",
-          "kind": "video",
-          "title": "STEREOMANTRA - Waterfall",
-          "artist": "Savvas Kalt",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "fTFRB25gwZ0",
           "source": "youtube",
           "kind": "video",
@@ -23256,14 +23163,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "nmfj5EwoEgA",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Hanuman",
-          "artist": "Аквариум I БГ+",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "mIf9expBou8",
           "source": "youtube",
           "kind": "video",
@@ -23277,14 +23176,6 @@
           "kind": "video",
           "title": "My Inner Shaman",
           "artist": "Sariel Orenda",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "XqUFq49Rthg",
-          "source": "youtube",
-          "kind": "video",
-          "title": "Threshold",
-          "artist": "Iwakura",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -23306,30 +23197,12 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "2273207054",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/akou_shz/akou-darkness-from-the-world-1",
-          "title": "AKOU - Darkness From The World [Mantra03]",
-          "artist": "AKOU",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "89454597",
           "source": "soundcloud",
           "kind": "track",
           "url": "https://soundcloud.com/ranjivlad/ayahuasca-class-a-rmx-snippet",
           "title": "Coming Soon - Ayahuasca (Class A Rmx) Snippet",
           "artist": "Class  A (official)",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "190765777",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/vascopsy/vasco-dino-20",
-          "title": "Vasco - Dino 2.0 (Soon @\"V.A. Shamanism \" [Popol Vuh Records])",
-          "artist": ".Vasco.",
           "added": "2026-06-17T00:00:00Z"
         }
       ]
@@ -23590,6 +23463,14 @@
           "source": "youtube",
           "kind": "video",
           "title": "Hymno",
+          "artist": "AWARË",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "PwkAZOqgM5M",
+          "source": "youtube",
+          "kind": "video",
+          "title": "AWARË Live at GOAT Community - Portugal 2025",
           "artist": "AWARË",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -24946,6 +24827,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "xQ09KRW9GA4",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Trusting the Process (1111 Hz)",
+          "artist": "Malte Marten - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "iV6dLsPpjAU",
           "source": "youtube",
           "kind": "video",
@@ -25614,6 +25503,14 @@
           "source": "youtube",
           "kind": "video",
           "title": "Crown of Amber Canopy",
+          "artist": "Slow Meadow",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "RAC9IAnIqmk",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Grey Cloud Lullaby",
           "artist": "Slow Meadow",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -26626,6 +26523,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "dAhQQtJeceE",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Distracted by Clouds",
+          "artist": "Aukai",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "S65UKKbDxVg",
           "source": "youtube",
           "kind": "video",
@@ -26678,6 +26583,14 @@
           "source": "youtube",
           "kind": "video",
           "title": "Barely Above",
+          "artist": "Aukai",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "PSk26AMb2h0",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Distracted by Clouds (Ben Lukas Boysen Remix)",
           "artist": "Aukai",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -26914,6 +26827,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "m8zZi5KFOKY",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Everlasting Expanse",
+          "artist": "QuixoticZ",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "J-031mXNfNY",
           "source": "youtube",
           "kind": "video",
@@ -27014,6 +26935,14 @@
           "source": "youtube",
           "kind": "video",
           "title": "Silo",
+          "artist": "sonder the africanime",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "shBjMLweNvg",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Clouds Parting",
           "artist": "sonder the africanime",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -27666,15 +27595,6 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "320212277",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/cricky-mccann/we-control-the-grapevine",
-          "title": "We Control The Grapevine (Cricky McCann Mashup)",
-          "artist": "CRICKY MCCANN",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "290675628",
           "source": "soundcloud",
           "kind": "track",
@@ -28177,6 +28097,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "BR18eEPT_Nk",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Tagelharpa - Hunt or Be Hunted (The Witcher 3 - Wild Hunt)",
+          "artist": "Ebanisteria Musicale C.M. Ferrari",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "FDeL6RM_2ZU",
           "source": "youtube",
           "kind": "video",
@@ -28217,30 +28145,12 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
-          "id": "4700900",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/back2roots/b2r-insomnia",
-          "title": "insomnia",
-          "artist": "Back2Roots",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
           "id": "279809653",
           "source": "soundcloud",
           "kind": "track",
           "url": "https://soundcloud.com/astateoftrance/omnia-audrey-gallagher-i-believe-out-now",
           "title": "Omnia & Audrey Gallagher - I Believe [OUT NOW]",
           "artist": "A State of Trance",
-          "added": "2026-06-17T00:00:00Z"
-        },
-        {
-          "id": "326648747",
-          "source": "soundcloud",
-          "kind": "track",
-          "url": "https://soundcloud.com/insomniacrecords/alan-walker-alex-skrindo-sky",
-          "title": "Alan Walker & Alex Skrindo - Sky",
-          "artist": "Insomniac Records",
           "added": "2026-06-17T00:00:00Z"
         }
       ]
@@ -28635,6 +28545,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "tLdKxI-JswQ",
+          "source": "youtube",
+          "kind": "video",
+          "title": "The Threads That Bind",
+          "artist": "Lorne Balfe",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "pS-gbqbVd8c",
           "source": "youtube",
           "kind": "video",
@@ -28687,6 +28605,14 @@
           "source": "youtube",
           "kind": "video",
           "title": "Heroes of Might And Magic IV - Sand Theme (Searching for a Dream) - Cover by Dryante ft. @MNISZECZ",
+          "artist": "Dryante Zan",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "8oqu7yhHAuo",
+          "source": "youtube",
+          "kind": "video",
+          "title": "The Witcher 3 - Skellige Combat Theme (Percival - Jomsborg) - Cover by Dryante ft. Elza Shtolz",
           "artist": "Dryante Zan",
           "added": "2026-06-17T00:00:00Z"
         },
@@ -29711,6 +29637,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "rt1lJ_7POHQ",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Everlasting",
+          "artist": "Malte Marten - Topic",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "rDjbdQtoNA8",
           "source": "youtube",
           "kind": "video",
@@ -29791,6 +29725,14 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "DB8-kZwexS0",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Kiki Rockwell - Hejo, Spann Den Wagen An",
+          "artist": "Kiki Rockwell",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "pEP72XorgdQ",
           "source": "youtube",
           "kind": "video",
@@ -29804,6 +29746,14 @@
           "kind": "video",
           "title": "Ott - The Queen of All Everything",
           "artist": "Bea Moggia",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "La5QW6XrjJE",
+          "source": "youtube",
+          "kind": "video",
+          "title": "AYTHIS - CELESTIAL EXILE [2024] + LOST LIGHTHOUSE [2024] w lyrics [Ethereal, Doomgaze, Neoclassical]",
+          "artist": "Dark_Atmospheric",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -29855,6 +29805,22 @@
           "added": "2026-06-17T00:00:00Z"
         },
         {
+          "id": "nmfj5EwoEgA",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Hanuman",
+          "artist": "Аквариум I БГ+",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "tJVoNc5ibeo",
+          "source": "youtube",
+          "kind": "video",
+          "title": "DUNE PILOT - Magnetic (Full Album 2023)",
+          "artist": "666MrDoom",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
           "id": "c7RQx9c40bQ",
           "source": "youtube",
           "kind": "video",
@@ -29876,6 +29842,22 @@
           "kind": "video",
           "title": "Just lights out? Death and what comes after (audiobook) - Alfred Weil",
           "artist": "Buddhas Lehre",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "gfIFUdFJdoM",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Praise The Lord (Da Shine)",
+          "artist": "ASAPROCKYUPTOWN",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "6xyNjZzrMq0",
+          "source": "youtube",
+          "kind": "video",
+          "title": "Everyday",
+          "artist": "ASAPROCKYUPTOWN",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -29912,6 +29894,15 @@
           "url": "https://soundcloud.com/angerkill/nsd-hai-la-noi-angerkill-remix",
           "title": "NSD - Hai La Noi [ANGERKILL REMIX]",
           "artist": "Angerkill",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "581218497",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/corntekk/corntekk23-afterlifeterror",
+          "title": "Corntekk - AfterlifeTerror",
+          "artist": "cσяитєкк Cottesound",
           "added": "2026-06-17T00:00:00Z"
         },
         {
@@ -30515,6 +30506,15 @@
           "url": "https://soundcloud.com/mrsuicidesheep/milky-chance-stolen-dance-embody-remix",
           "title": "Milky Chance - Stolen Dance (Embody Remix)",
           "artist": "MrSuicideSheep",
+          "added": "2026-06-17T00:00:00Z"
+        },
+        {
+          "id": "287573109",
+          "source": "soundcloud",
+          "kind": "track",
+          "url": "https://soundcloud.com/wearegraves/graves-king-tadashi-falkor-the-luck-dragon",
+          "title": "graves & Tadashi - Falkor the Luck Dragon",
+          "artist": "graves",
           "added": "2026-06-17T00:00:00Z"
         },
         {
