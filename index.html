@@ -1023,6 +1023,7 @@ const LS_KEY = "temple_library_v1";
 const SEED_GENRES = ["Goa / Psytrance", "Hi-Tech", "Progressive Psy", "Forest / Darkpsy", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Drum & Bass", "Liquid DnB", "Neurofunk", "Jump Up", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
 
 let LIB = { version:1, updated:null, genres:[] };  // working copy
+let _dataLoaded = false;   // sind die Per-Genre-Track-Daten schon da?
 let FLAT = [];          // flattened, filtered playable list (current view order)
 let curId = null;       // currently playing entry uid
 let openGenres = new Set();  // aufgeklappte Genre-Sektionen (Akkordeon)
@@ -1045,20 +1046,29 @@ function genreNames(){ return LIB.genres.map(g=>g.name); }
 
 /* ---------- load ---------- */
 async function loadLibrary(){
-  let base = null;
-  try{
-    const r = await fetch("playlists.json", {cache:"no-store"});
-    if (r.ok) base = await r.json();
-  }catch(e){}
-  if (!base || !Array.isArray(base.genres)){
-    base = { version:1, genres: SEED_GENRES.map(n=>({name:n,tracks:[]})) };
-  }
-  // merge local staging on top (admin unpublished edits)
+  let man = null;
+  try{ const r = await fetch("playlists.json", {cache:"no-store"}); if (r.ok) man = await r.json(); }catch(e){}
   let local = null;
   try{ local = JSON.parse(localStorage.getItem(LS_KEY)||"null"); }catch(e){}
-  LIB = (local && Array.isArray(local.genres)) ? local : base;
-  // make sure seed groups exist for a non-empty index
-  SEED_GENRES.forEach(ensureGenre);
+  // Admin-Stand (lokal, voll) hat Vorrang
+  if (local && Array.isArray(local.genres) && local.genres.some(g=>g.tracks && g.tracks.length)){
+    LIB = local; _dataLoaded = true; SEED_GENRES.forEach(ensureGenre); return;
+  }
+  if (man && man.manifest){   // NEU: Manifest sofort, Tracks progressiv
+    LIB = { version:2, updated:man.updated, total:man.total, hsec:man.hsec,
+            genres: man.genres.map(g=>({name:g.name, count:g.count, tracks:[]})) };
+    loadAllData();   // non-blocking
+    return;
+  }
+  if (man && Array.isArray(man.genres)){ LIB = man; _dataLoaded = true; SEED_GENRES.forEach(ensureGenre); return; }  // Altformat
+  LIB = { version:1, genres: SEED_GENRES.map(n=>({name:n,tracks:[]})) }; _dataLoaded = true;
+}
+async function loadAllData(){
+  await Promise.all(LIB.genres.map(async g=>{
+    if (g.tracks.length) return;
+    try{ const r = await fetch("data/"+slug(g.name)+".json", {cache:"no-store"}); if (r.ok){ const d = await r.json(); g.tracks = (d && d.tracks) || []; } }catch(e){}
+  }));
+  _dataLoaded = true; render();
 }
 function saveLocal(){
   LIB.updated = new Date().toISOString();
@@ -1097,34 +1107,36 @@ function render(){
   buildFlat(q);
   let total = 0, shownGenres = 0;
   LIB.genres.forEach(g=>{
+    const cnt = g.tracks.length || g.count || 0;     // Manifest-Anzahl bis Daten geladen
     const matches = g.tracks.filter(t=>matchTrack(t,g.name,q));
-    total += g.tracks.length;
+    total += cnt;
     if (q && matches.length===0) return;   // beim Suchen leere Genres ausblenden
     shownGenres++;
     const id = "g-"+slug(g.name);
     const a = document.createElement("a");
-    a.href = "#"+id; a.innerHTML = esc(g.name) + ' <span class="c">'+g.tracks.length+'</span>';
+    a.href = "#"+id; a.innerHTML = esc(g.name) + ' <span class="c">'+cnt+'</span>';
     gnav.appendChild(a);
     const sec = document.createElement("section");
     const isOpen = openGenres.has(g.name) || (q && matches.length);
     sec.className = "section" + (isOpen ? " open" : "");
     sec.id = id; sec.dataset.genre = g.name;
-    // PERFORMANCE: Zeilen nur bauen wenn offen (lazy) — skaliert auf tausende Tracks
+    // PERFORMANCE: Zeilen nur bauen wenn offen (lazy) + Daten lazy ("// lädt…" bis da)
+    const body = isOpen ? ((g.tracks.length || _dataLoaded) ? rowsHTML(matches) : '<div class="empty">// lädt…</div>') : "";
     sec.innerHTML = `<div class="section__head" role="button" tabindex="0" data-genre="${esc(g.name)}" aria-expanded="${isOpen?'true':'false'}">
         <h2>${esc(g.name)}</h2>
         <span class="section__line"></span>
-        <span class="section__count">${matches.length} / ${g.tracks.length}</span>
+        <span class="section__count">${q?matches.length:cnt} / ${cnt}</span>
         <span class="section__tog" aria-hidden="true"></span>
-      </div><div class="tracks">${isOpen ? rowsHTML(matches) : ""}</div>`;
+      </div><div class="tracks">${body}</div>`;
     idx.appendChild(sec);
   });
   if (shownGenres===0){
     idx.innerHTML = `<section class="section"><div class="empty" style="padding:60px 0">// KEIN TREFFER für „${esc($("#search").value)}"</div></section>`;
   }
-  $("#m-tracks").textContent = total;
-  $("#m-genres").textContent = LIB.genres.filter(g=>g.tracks.length).length;
-  let secs=0; LIB.genres.forEach(g=>g.tracks.forEach(t=> secs += t.dur || 300));  // echte Länge, fehlende ~5min geschätzt
-  $("#m-hours").textContent = Math.round(secs/3600);
+  $("#m-tracks").textContent = (LIB.total!=null ? LIB.total : total);
+  $("#m-genres").textContent = LIB.genres.filter(g=>(g.tracks.length||g.count)).length;
+  $("#m-hours").textContent = (LIB.hsec!=null) ? Math.round(LIB.hsec/3600)
+    : Math.round(LIB.genres.reduce((s,g)=>s+g.tracks.reduce((a,t)=>a+(t.dur||300),0),0)/3600);
 }
 
 /* ====================================================================
@@ -1440,9 +1452,13 @@ function toggleGenre(name, head){
   const tracks = sec.querySelector(".tracks");
   if (!tracks) return;
   if (open){
-    if (!tracks.firstChild){   // lazy: Zeilen erst beim Öffnen bauen
-      const g = LIB.genres.find(x=>x.name===name); const q = norm($("#search").value);
-      tracks.innerHTML = rowsHTML((g?g.tracks:[]).filter(t=>matchTrack(t,name,q)));
+    const g = LIB.genres.find(x=>x.name===name);
+    const fill = ()=>{ const q=norm($("#search").value); tracks.innerHTML = rowsHTML((g?g.tracks:[]).filter(t=>matchTrack(t,name,q))); };
+    if (g && !g.tracks.length && !_dataLoaded){           // Daten noch nicht da -> jetzt holen
+      tracks.innerHTML = '<div class="empty">// lädt…</div>';
+      fetch("data/"+slug(name)+".json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{ if(d&&d.tracks) g.tracks=d.tracks; fill(); }).catch(fill);
+    } else {
+      fill();
     }
   } else {
     tracks.innerHTML = "";   // DOM beim Schließen freigeben (Skalierung)
