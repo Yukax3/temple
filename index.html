@@ -345,10 +345,16 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   .top__row{flex-wrap:wrap;height:auto;padding:10px 0;gap:10px}
   .search{order:3;max-width:none;flex-basis:100%}
   .stage__row{grid-template-columns:1fr 140px 28px}
-  .pl__right .pl__vid{display:none}
-  .vol{display:none}
+  /* Player kompakt: Titel + Random/Prev/Play/Next, Rest weg, Fortschritt als Linie oben */
+  .player{grid-template-columns:1fr auto;gap:6px;padding-left:12px;padding-right:12px}
+  .player::before{content:"";position:absolute;left:0;top:0;height:2px;width:var(--prog,0%);background:var(--accent)}
+  .pl__right{display:none}
+  #btn-shuffle,#btn-repeat{display:none}
+  .pl__ctrls{gap:0}
+  .pl__btn{width:36px;height:36px}
+  .pl__btn--play{width:42px;height:42px}
+  .pl__btn svg{width:17px;height:17px}
   .viz{display:none}
-  .seek{max-width:140px}
   #ytwrap.show{width:200px;height:113px}
 }
 @media (prefers-reduced-motion:reduce){
@@ -415,6 +421,9 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
     <div class="viz" id="viz" aria-hidden="true"></div>
   </div>
   <div class="pl__ctrls">
+    <button class="pl__btn" id="btn-random" aria-label="Zufalls-Track aus allem" title="Zufalls-Track (ganze Bibliothek)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg>
+    </button>
     <button class="pl__btn" id="btn-shuffle" aria-label="Zufall" title="Zufall">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/><path d="M16 21h5v-5"/><path d="M3 3l5.5 5.5"/></svg>
     </button>
@@ -536,14 +545,31 @@ const fmt = t => { t=Math.max(0,Math.floor(t||0)); const m=Math.floor(t/60), s=t
 /* ---------- genre classifier (heuristik, kein API-key) ---------- */
 /* Reihenfolge = Priorität bei Gleichstand. Stichwörter frei erweiterbar. */
 const GENRE_RULES = [
-  ["meiko","Chill / Lounge"], ["leave the lights on","Chill / Lounge"], ["omer balik","Chill / Lounge"],
-  ["omer balık","Chill / Lounge"], ["coffee blues","Chill / Lounge"], ["bon iver","Chill / Lounge"],
-  ["daniel norgren","Akustik / Folk"], ["hermanos gutierrez","Akustik / Folk"],
-  ["hermanos gutiérrez","Akustik / Folk"], ["estas tonne","Akustik / Folk"], ["estás tonné","Akustik / Folk"],
-  ["jose gonzalez","Akustik / Folk"], ["josé gonzález","Akustik / Folk"], ["ben howard","Akustik / Folk"],
-  ["keaton henson","Akustik / Folk"], ["gnarls barkley","Indie / Dream-Pop"],
-  ["adam vandal","Freetekno / Tekno"], ["adam vandal","Freetekno / Tekno"], ["grasgeflüster","Reggae / Dub"],
-  ["grasgefluster","Reggae / Dub"], ["trip hazard","Psychedelic Rock"], ["game of thrones","Game / OST"],
+  ["hi-tech","Hi-Tech"], ["hitech","Hi-Tech"], ["hi tech","Hi-Tech"], ["henrique camacho","Hi-Tech"],
+  ["psykart","Hi-Tech"], ["maramba","Hi-Tech"], ["marambá","Hi-Tech"], ["retro future trance","Hi-Tech"],
+  ["fake drop 180bpm","Hi-Tech"], ["200 bpm","Hi-Tech"], ["progressive psytrance","Progressive Psy"],
+  ["progressive psy","Progressive Psy"], ["prog psy","Progressive Psy"],
+  ["progressive trance","Progressive Psy"], ["progressive mix","Progressive Psy"], ["full-on","Full-On"],
+  ["fullon","Full-On"], ["full on","Full-On"], ["forest psy","Forest / Darkpsy"],
+  ["forestpsy","Forest / Darkpsy"], ["darkpsy","Forest / Darkpsy"], ["dark psy","Forest / Darkpsy"],
+  ["hi-tech forest","Forest / Darkpsy"], ["psycore","Forest / Darkpsy"], ["nuages","Ambient / IDM"],
+  ["n u a g e s","Ambient / IDM"], ["kachu","Freetekno / Tekno"], ["kachu2k","Freetekno / Tekno"],
+  ["city am fenster","Volksmusik / Schlager"], ["am fenster","Volksmusik / Schlager"],
+  ["drum and bass","Drum & Bass"], ["drum & bass","Drum & Bass"], ["dnb","Drum & Bass"],
+  ["neurofunk","Drum & Bass"], ["liquid dnb","Drum & Bass"], ["jump up","Drum & Bass"], ["d&b","Drum & Bass"],
+  ["driftwood holly","Akustik / Folk"], ["the comet is coming","Downtempo / Trip-Hop"],
+  ["comet is coming","Downtempo / Trip-Hop"], ["forest swords","Downtempo / Trip-Hop"],
+  ["neelix","Goa / Psytrance"], ["unlogix","Goa / Psytrance"], ["daso","Techno / House"],
+  ["hotel pools","Pop / Synthwave"], ["oddling","Pop / Synthwave"], ["ivoxygen","Pop / Synthwave"],
+  ["mokalamity","Reggae / Dub"], ["electronic system","Pop / Synthwave"], ["meiko","Chill / Lounge"],
+  ["leave the lights on","Chill / Lounge"], ["omer balik","Chill / Lounge"], ["omer balık","Chill / Lounge"],
+  ["coffee blues","Chill / Lounge"], ["bon iver","Chill / Lounge"], ["daniel norgren","Akustik / Folk"],
+  ["hermanos gutierrez","Akustik / Folk"], ["hermanos gutiérrez","Akustik / Folk"],
+  ["estas tonne","Akustik / Folk"], ["estás tonné","Akustik / Folk"], ["jose gonzalez","Akustik / Folk"],
+  ["josé gonzález","Akustik / Folk"], ["ben howard","Akustik / Folk"], ["keaton henson","Akustik / Folk"],
+  ["gnarls barkley","Indie / Dream-Pop"], ["adam vandal","Freetekno / Tekno"],
+  ["adam vandal","Freetekno / Tekno"], ["grasgeflüster","Reggae / Dub"], ["grasgefluster","Reggae / Dub"],
+  ["trip hazard","Psychedelic Rock"], ["game of thrones","Game / OST"],
   ["psychedelic rock","Psychedelic Rock"], ["psych rock","Psychedelic Rock"],
   ["space rock","Psychedelic Rock"], ["dungeon synth","Mittelalter / Neofolk"],
   ["psychedelic kung fu","Psychedelic Rock"], ["psychill","Psybient / Psychill"],
@@ -946,7 +972,7 @@ async function fetchMeta(url){
    STATE
    ==================================================================== */
 const LS_KEY = "temple_library_v1";
-const SEED_GENRES = ["Goa / Psytrance", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
+const SEED_GENRES = ["Goa / Psytrance", "Hi-Tech", "Progressive Psy", "Forest / Darkpsy", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Drum & Bass", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
 
 let LIB = { version:1, updated:null, genres:[] };  // working copy
 let FLAT = [];          // flattened, filtered playable list (current view order)
@@ -1183,6 +1209,7 @@ function updateTime(c,d){
   $("#t-dur").textContent = fmt(d);
   const p = d ? (c/d) : 0;
   $("#seek-fill").style.width = (p*100)+"%";
+  $("#player").style.setProperty("--prog", (p*100)+"%");   // Mobile-Fortschrittslinie
   const si = $("#seek-input"); if (document.activeElement !== si) si.value = Math.round(p*1000);
 }
 function startTicker(){
@@ -1390,6 +1417,10 @@ function bind(){
   $("#btn-play").onclick = togglePlay;
   $("#btn-next").onclick = next;
   $("#btn-prev").onclick = prev;
+  $("#btn-random").onclick = ()=>{
+    const all=[]; LIB.genres.forEach(g=>g.tracks.forEach(t=>all.push({t,genre:g.name})));
+    if (all.length) startPlay(all[Math.floor(Math.random()*all.length)]);
+  };
   $("#btn-shuffle").onclick = e=>{ shuffle=!shuffle; e.currentTarget.classList.toggle("is-on",shuffle); };
   $("#btn-repeat").onclick = e=>{ repeat=!repeat; e.currentTarget.classList.toggle("is-on",repeat); };
   $("#btn-video").onclick = e=>{ const on=$("#ytwrap").classList.toggle("show"); e.currentTarget.classList.toggle("is-on",on); };
