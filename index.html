@@ -561,15 +561,28 @@ const GENRE_RULES = [
   ["comet is coming","Downtempo / Trip-Hop"], ["forest swords","Downtempo / Trip-Hop"],
   ["neelix","Goa / Psytrance"], ["unlogix","Goa / Psytrance"], ["daso","Techno / House"],
   ["hotel pools","Pop / Synthwave"], ["oddling","Pop / Synthwave"], ["ivoxygen","Pop / Synthwave"],
-  ["mokalamity","Reggae / Dub"], ["electronic system","Pop / Synthwave"], ["meiko","Chill / Lounge"],
-  ["leave the lights on","Chill / Lounge"], ["omer balik","Chill / Lounge"], ["omer balık","Chill / Lounge"],
-  ["coffee blues","Chill / Lounge"], ["bon iver","Chill / Lounge"], ["daniel norgren","Akustik / Folk"],
-  ["hermanos gutierrez","Akustik / Folk"], ["hermanos gutiérrez","Akustik / Folk"],
-  ["estas tonne","Akustik / Folk"], ["estás tonné","Akustik / Folk"], ["jose gonzalez","Akustik / Folk"],
-  ["josé gonzález","Akustik / Folk"], ["ben howard","Akustik / Folk"], ["keaton henson","Akustik / Folk"],
-  ["gnarls barkley","Indie / Dream-Pop"], ["adam vandal","Freetekno / Tekno"],
-  ["adam vandal","Freetekno / Tekno"], ["grasgeflüster","Reggae / Dub"], ["grasgefluster","Reggae / Dub"],
-  ["trip hazard","Psychedelic Rock"], ["game of thrones","Game / OST"],
+  ["mokalamity","Reggae / Dub"], ["electronic system","Pop / Synthwave"], ["john summit","Techno / House"],
+  ["fred again","Techno / House"], ["fatboy slim","Pop / Synthwave"], ["oliver tree","Indie / Dream-Pop"],
+  ["goddard.","Techno / House"], ["high contrast","Liquid DnB"], ["dj marky","Liquid DnB"],
+  ["london elektricity","Liquid DnB"], ["netsky","Liquid DnB"], ["etherwood","Liquid DnB"],
+  ["keeno","Liquid DnB"], ["lenzman","Liquid DnB"], ["bcee","Liquid DnB"], ["hybrid minds","Liquid DnB"],
+  ["fred v","Liquid DnB"], ["grafix","Liquid DnB"], ["maduk","Liquid DnB"], ["feint","Liquid DnB"],
+  ["koven","Liquid DnB"], ["technimatic","Liquid DnB"], ["whiney","Liquid DnB"], ["blu mar ten","Liquid DnB"],
+  ["hybrid theory","Liquid DnB"], ["liquid dnb","Liquid DnB"], ["liquid funk","Liquid DnB"],
+  ["noisia","Neurofunk"], ["phace","Neurofunk"], ["mefjus","Neurofunk"], ["black sun empire","Neurofunk"],
+  ["annix","Neurofunk"], ["billain","Neurofunk"], ["current value","Neurofunk"], ["maztek","Neurofunk"],
+  ["the upbeats","Neurofunk"], ["prolix","Neurofunk"], ["neurofunk","Neurofunk"],
+  ["agressor bunx","Neurofunk"], ["macky gee","Jump Up"], ["skepsis","Jump Up"], ["kanine","Jump Up"],
+  ["hedex","Jump Up"], ["dj hazard","Jump Up"], ["original sin","Jump Up"], ["benny l","Jump Up"],
+  ["sub zero","Jump Up"], ["dutta","Jump Up"], ["jump up","Jump Up"], ["windhand","Stoner / Doom"],
+  ["meiko","Chill / Lounge"], ["leave the lights on","Chill / Lounge"], ["omer balik","Chill / Lounge"],
+  ["omer balık","Chill / Lounge"], ["coffee blues","Chill / Lounge"], ["bon iver","Chill / Lounge"],
+  ["daniel norgren","Akustik / Folk"], ["hermanos gutierrez","Akustik / Folk"],
+  ["hermanos gutiérrez","Akustik / Folk"], ["estas tonne","Akustik / Folk"], ["estás tonné","Akustik / Folk"],
+  ["jose gonzalez","Akustik / Folk"], ["josé gonzález","Akustik / Folk"], ["ben howard","Akustik / Folk"],
+  ["keaton henson","Akustik / Folk"], ["gnarls barkley","Indie / Dream-Pop"],
+  ["adam vandal","Freetekno / Tekno"], ["adam vandal","Freetekno / Tekno"], ["grasgeflüster","Reggae / Dub"],
+  ["grasgefluster","Reggae / Dub"], ["trip hazard","Psychedelic Rock"], ["game of thrones","Game / OST"],
   ["psychedelic rock","Psychedelic Rock"], ["psych rock","Psychedelic Rock"],
   ["space rock","Psychedelic Rock"], ["dungeon synth","Mittelalter / Neofolk"],
   ["psychedelic kung fu","Psychedelic Rock"], ["psychill","Psybient / Psychill"],
@@ -972,7 +985,7 @@ async function fetchMeta(url){
    STATE
    ==================================================================== */
 const LS_KEY = "temple_library_v1";
-const SEED_GENRES = ["Goa / Psytrance", "Hi-Tech", "Progressive Psy", "Forest / Darkpsy", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Drum & Bass", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
+const SEED_GENRES = ["Goa / Psytrance", "Hi-Tech", "Progressive Psy", "Forest / Darkpsy", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Drum & Bass", "Liquid DnB", "Neurofunk", "Jump Up", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
 
 let LIB = { version:1, updated:null, genres:[] };  // working copy
 let FLAT = [];          // flattened, filtered playable list (current view order)
