@@ -12,6 +12,11 @@
 <link rel="canonical" href="https://temple-taupe-three.vercel.app/">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="favicon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="TEMPLE">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="TEMPLE">
@@ -403,9 +408,10 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   <div class="wrap">
     <h1>TEMPLE<span class="dot">.</span></h1>
     <div class="hero__sub">
-      <span>Goa/Psy</span><span>Psybient</span><span>Ambient</span><span>Downtempo</span>
-      <span>Techno</span><span>Freetekno</span><span>Reggae/Dub</span><span>Stoner</span>
-      <span>Indie</span><span>Rock</span><span>Folktronica</span><span>Mittelalter</span><span>Satire</span>
+      <span>Goa/Psy</span><span>Hi-Tech</span><span>Progressive</span><span>Psybient</span><span>Ambient</span><span>Downtempo</span>
+      <span>Techno</span><span>Freetekno</span><span>Drum&amp;Bass</span><span>Hardcore</span><span>Roots Reggae</span><span>Dub</span>
+      <span>Stoner</span><span>Indie</span><span>Rock</span><span>Punk</span><span>HipHop</span><span>Organic</span>
+      <span>Folktronica</span><span>Mittelalter</span><span>Game/OST</span><span>Satire</span>
     </div>
     <div class="hero__meta">
       <span><b id="m-tracks">0</b> Tracks</span>
@@ -1030,6 +1036,7 @@ let openGenres = new Set();  // aufgeklappte Genre-Sektionen (Akkordeon)
 let isPlaying = false;
 let shuffle = false, repeat = false;
 let volume = 100, muted = false;
+let fadeMul = 1, fadeOn = true; const FADE = 6;   // weiche Ein-/Ausblendung (Sek)
 let ytApiReady = false, ytReady = false, player = null, ticker = null;
 let scApiReady = false, scReady = false, scWidget = null, scPos = 0;   // SoundCloud-Engine
 let ytLoading = false, scLoading = false;   // Player-APIs erst bei Bedarf laden
@@ -1160,9 +1167,10 @@ function resume(src){ if (pending && (pending.t.source||"youtube")===src){ const
 function findEntry(u){ return FLAT.find(e=>uid(e.t)===u) || null; }
 function playUid(u){ const e = findEntry(u); if (e) startPlay(e); }
 
-function startPlay(e){
+function startPlay(e, noOpen){
   curId = uid(e.t);
-  if (e.genre) openGenres.add(e.genre);
+  fadeMul = fadeOn ? 0 : 1;   // neuer Track blendet sanft ein
+  if (e.genre && !noOpen) openGenres.add(e.genre);   // Randomizer öffnet die Sektion NICHT
   curSource = e.t.source || "youtube";
   isPlaying = true;
   updateBar(e);
@@ -1259,6 +1267,16 @@ function updateBar(e){
   $("#pl-title").textContent = e.t.title || e.t.id;
   $("#pl-artist").textContent = e.t.artist || "—";
   reflectPlay();
+  // Lock-Screen / Kopfhörer-Steuerung (MediaSession) — zeigt Track + erlaubt Play/Pause/Next/Prev
+  if ("mediaSession" in navigator){
+    try{
+      navigator.mediaSession.metadata = new MediaMetadata({ title:e.t.title||"", artist:e.t.artist||"", album:"TEMPLE · "+(e.genre||"") });
+      navigator.mediaSession.setActionHandler("play", togglePlay);
+      navigator.mediaSession.setActionHandler("pause", togglePlay);
+      navigator.mediaSession.setActionHandler("nexttrack", next);
+      navigator.mediaSession.setActionHandler("previoustrack", prev);
+    }catch(_){}
+  }
 }
 function updateTime(c,d){
   $("#t-cur").textContent = fmt(c);
@@ -1267,6 +1285,11 @@ function updateTime(c,d){
   $("#seek-fill").style.width = (p*100)+"%";
   $("#player").style.setProperty("--prog", (p*100)+"%");   // Mobile-Fortschrittslinie
   const si = $("#seek-input"); if (document.activeElement !== si) si.value = Math.round(p*1000);
+  // weiche Übergänge: fadeMul aus Position (rein über erste FADE s, raus über letzte FADE s); Mitte = 1 (selbstkorrigierend)
+  if (fadeOn && d > 2*FADE){
+    const fm = Math.max(0, Math.min(1, Math.min(c/FADE, (d-c)/FADE)));
+    if (Math.abs(fm - fadeMul) > 0.02){ fadeMul = fm; applyVolume(); }
+  } else if (d > 0 && fadeMul !== 1){ fadeMul = 1; applyVolume(); }
 }
 function startTicker(){
   clearInterval(ticker);
@@ -1430,12 +1453,13 @@ function setStat(sel,msg,cls){ const el=$(sel); el.textContent=msg; el.className
    WIRING
    ==================================================================== */
 function applyVolume(){
+  const eff = Math.round((muted ? 0 : volume) * fadeMul);   // fadeMul = weiche Übergänge (0..1)
   if (player && ytReady){
-    if (muted || volume===0){ player.mute(); }
-    else { player.unMute(); player.setVolume(volume); }
+    if (eff===0){ player.mute(); }
+    else { player.unMute(); player.setVolume(eff); }
   }
-  if (scWidget){ try{ scWidget.setVolume(muted ? 0 : volume); }catch(_){} }
-  const shown = (muted || volume===0);
+  if (scWidget){ try{ scWidget.setVolume(eff); }catch(_){} }
+  const shown = (muted || volume===0);   // UI zeigt die EINGESTELLTE Lautstärke, nicht den Fade
   $("#vol-fill").style.width = (shown?0:volume) + "%";
   $("#ic-vol").style.display = shown ? "none":"block";
   $("#ic-mute").style.display = shown ? "block":"none";
@@ -1491,7 +1515,7 @@ function bind(){
   $("#btn-prev").onclick = prev;
   $("#btn-random").onclick = ()=>{
     const all=[]; LIB.genres.forEach(g=>g.tracks.forEach(t=>all.push({t,genre:g.name})));
-    if (all.length) startPlay(all[Math.floor(Math.random()*all.length)]);
+    if (all.length) startPlay(all[Math.floor(Math.random()*all.length)], true);   // true = Sektion nicht aufklappen
   };
   $("#btn-shuffle").onclick = e=>{ shuffle=!shuffle; e.currentTarget.classList.toggle("is-on",shuffle); };
   $("#btn-repeat").onclick = e=>{ repeat=!repeat; e.currentTarget.classList.toggle("is-on",repeat); };
@@ -1532,6 +1556,7 @@ async function boot(){
   bind();
   render();
   routeHash();   // Player-APIs (YT/SC) werden erst beim ersten Play geladen → schnellerer Initial-Load
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});   // PWA / installierbar
 }
 boot();
 })();

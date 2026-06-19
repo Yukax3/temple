@@ -1,0 +1,14 @@
+{
+  "name": "TEMPLE — Underground Music Archive",
+  "short_name": "TEMPLE",
+  "description": "Brutalistischer Underground-Musik-Tempel — 30+ Genres, direkt abspielbar.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "lang": "de",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
