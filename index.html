@@ -489,6 +489,8 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 
 <div id="ytwrap"><div id="ytplayer"></div></div>
 <div id="scwrap" aria-hidden="true" style="position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;z-index:-1"><iframe id="scplayer" allow="autoplay" frameborder="0" scrolling="no"></iframe></div>
+<!-- Natives SC-Audio: spielt direkte Stream-URL (via /api/stream) -> läuft im iOS-Hintergrund/Lock-Screen weiter. src = stilles WAV für iOS-Geste-Unlock -->
+<audio id="scaudio" preload="none" playsinline src="data:audio/wav;base64,UklGRiwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQgAAACAgICAgICAgA=="></audio>
 
 <!-- ============ ADMIN HUB ============ -->
 <div class="admin" id="admin" role="dialog" aria-modal="true" aria-label="Admin Hub">
@@ -1039,6 +1041,8 @@ let volume = 100, muted = false;
 let fadeMul = 1, fadeOn = true; const FADE = 6;   // weiche Ein-/Ausblendung (Sek)
 let ytApiReady = false, ytReady = false, player = null, ticker = null;
 let scApiReady = false, scReady = false, scWidget = null, scPos = 0;   // SoundCloud-Engine
+let scAudio = null, curScMode = null;   // natives <audio> für SC; curScMode = "native" | "widget" pro Track
+let scNative = !/[?&]widget\b/.test(location.search);   // ?widget = altes Widget erzwingen (zum Vergleich)
 let ytLoading = false, scLoading = false;   // Player-APIs erst bei Bedarf laden
 let curSource = "youtube", pending = null;
 
@@ -1189,6 +1193,7 @@ function buildPlayer(e){
 }
 function playYT(e){
   if (scWidget){ try{ scWidget.pause(); }catch(_){} }
+  if (scAudio){ try{ scAudio.pause(); }catch(_){} }
   if (!ytApiReady){ if(!ytLoading){ ytLoading=true; loadYTApi(); } pending = e; return; }
   if (!player){ buildPlayer(e); return; }
   if (!ytReady){ pending = e; return; }
@@ -1205,7 +1210,43 @@ function onState(ev){
 
 // SoundCloud: Widget-API
 function scUrl(t){ return t.url || ("https://soundcloud.com/"+t.id); }
+const SC_SILENT = "data:audio/wav;base64,UklGRiwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQgAAACAgICAgICAgA==";
+
 function playSC(e){
+  if (scNative && /^\d+$/.test(String(e.t.id))) playSCNative(e);   // nur numerische SC-IDs sind über /api/stream auflösbar
+  else playSCWidget(e);
+}
+
+// NATIV: direkte Stream-URL via /api/stream -> <audio>. Läuft im iOS-Hintergrund/Lock-Screen.
+async function playSCNative(e){
+  curScMode = "native";
+  if (!scAudio) scAudio = $("#scaudio");
+  if (player && ytReady){ try{ player.pauseVideo(); }catch(_){} }
+  if (scWidget){ try{ scWidget.pause(); }catch(_){} }
+  // iOS: NOCH innerhalb der Nutzer-Geste (Track-Klick) das <audio> "freischalten"
+  try{ scAudio.src = SC_SILENT; scAudio.play().catch(()=>{}); }catch(_){}
+  scReady = false;
+  const myId = uid(e.t);
+  let j;
+  try{
+    const r = await fetch("/api/stream?id=" + encodeURIComponent(e.t.id));
+    j = await r.json().catch(()=>({}));
+    if (!r.ok || !j.url) throw new Error(j.error || ("HTTP " + r.status));
+  }catch(err){
+    console.warn("SC nativ fehlgeschlagen -> Widget-Fallback:", err && err.message);
+    if (curId === myId) playSCWidget(e);   // dieser Track nicht streambar (Go+?) -> Widget
+    return;
+  }
+  if (curId !== myId) return;   // Nutzer hat inzwischen umgeschaltet
+  scAudio.src = j.url;
+  applyVolume();
+  scAudio.play().then(()=>{ scReady = true; isPlaying = true; reflectPlay(); startTicker(); }).catch(()=>{});
+}
+
+// WIDGET (Fallback / ?widget): altes iframe-Verhalten
+function playSCWidget(e){
+  curScMode = "widget";
+  if (scAudio){ try{ scAudio.pause(); }catch(_){} }
   if (player && ytReady){ try{ player.pauseVideo(); }catch(_){} }
   if (!scApiReady){ if(!scLoading){ scLoading=true; loadSCApi(); } pending = e; return; }
   if (!scWidget){ buildSC(scUrl(e.t)); return; }
@@ -1240,7 +1281,10 @@ function buildViz(){
 }
 function togglePlay(){
   if (!curId){ if (FLAT.length) playUid(uid(FLAT[0].t)); return; }
-  if (curSource === "soundcloud"){ if(!scWidget) return; if(isPlaying) scWidget.pause(); else scWidget.play(); return; }
+  if (curSource === "soundcloud"){
+    if (curScMode === "native"){ if(!scAudio) return; if(scAudio.paused) scAudio.play().catch(()=>{}); else scAudio.pause(); return; }
+    if(!scWidget) return; if(isPlaying) scWidget.pause(); else scWidget.play(); return;
+  }
   if (!player || !ytReady) return;
   const st = player.getPlayerState();
   if (st === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
@@ -1256,8 +1300,12 @@ function next(){
 }
 function prev(){
   if (!FLAT.length) return;
-  const pos = curSource==="soundcloud" ? scPos : (ytReady && player ? player.getCurrentTime() : 0);
-  if (pos > 3){ if (curSource==="soundcloud" && scWidget) scWidget.seekTo(0); else if (player) player.seekTo(0,true); return; }
+  const pos = curSource==="soundcloud" ? (curScMode==="native" ? (scAudio?scAudio.currentTime:0) : scPos) : (ytReady && player ? player.getCurrentTime() : 0);
+  if (pos > 3){
+    if (curSource==="soundcloud"){ if(curScMode==="native"){ if(scAudio) scAudio.currentTime=0; } else if(scWidget) scWidget.seekTo(0); }
+    else if (player) player.seekTo(0,true);
+    return;
+  }
   let i = curIndex(); i = (i - 1 + FLAT.length) % FLAT.length;
   playUid(uid(FLAT[i].t));
 }
@@ -1295,8 +1343,13 @@ function startTicker(){
   clearInterval(ticker);
   ticker = setInterval(()=>{
     if (curSource === "soundcloud"){
-      if (!scWidget) return;
-      scWidget.getPosition(p=>{ scPos=(p||0)/1000; scWidget.getDuration(d=>updateTime(scPos,(d||0)/1000)); });
+      if (curScMode === "native"){
+        if (!scAudio) return;
+        updateTime(scAudio.currentTime || 0, scAudio.duration || 0);
+      } else {
+        if (!scWidget) return;
+        scWidget.getPosition(p=>{ scPos=(p||0)/1000; scWidget.getDuration(d=>updateTime(scPos,(d||0)/1000)); });
+      }
     } else {
       if (!player || !player.getDuration) return;
       updateTime(player.getCurrentTime()||0, player.getDuration()||0);
@@ -1459,6 +1512,7 @@ function applyVolume(){
     else { player.unMute(); player.setVolume(eff); }
   }
   if (scWidget){ try{ scWidget.setVolume(eff); }catch(_){} }
+  if (scAudio){ try{ scAudio.volume = Math.max(0, Math.min(1, eff/100)); }catch(_){} }
   const shown = (muted || volume===0);   // UI zeigt die EINGESTELLTE Lautstärke, nicht den Fade
   $("#vol-fill").style.width = (shown?0:volume) + "%";
   $("#ic-vol").style.display = shown ? "none":"block";
@@ -1524,11 +1578,21 @@ function bind(){
   $("#vol-input").addEventListener("input", e=>{ volume=+e.target.value; muted=(volume===0); applyVolume(); });
   $("#btn-vol").onclick = ()=>{ muted=!muted; if(!muted && volume===0) volume=60; applyVolume(); };
   applyVolume();
+  // natives SC-<audio>: Events nur greifen lassen, wenn aktuell nativ-SC läuft.
+  // WICHTIG: den stillen data:-Unlock-Clip ignorieren (sonst feuert sein "ended" -> next() -> Schleife).
+  scAudio = $("#scaudio");
+  const scIsRealStream = ()=> !((scAudio.currentSrc||scAudio.src||"").startsWith("data:"));
+  scAudio.addEventListener("ended", ()=>{ if(curSource==="soundcloud" && curScMode==="native" && scIsRealStream()) next(); });
+  scAudio.addEventListener("play",  ()=>{ if(curSource==="soundcloud" && curScMode==="native" && scIsRealStream()){ isPlaying=true;  reflectPlay(); } });
+  scAudio.addEventListener("pause", ()=>{ if(curSource==="soundcloud" && curScMode==="native" && !scAudio.ended && scIsRealStream()){ isPlaying=false; reflectPlay(); } });
   // seek
   $("#seek-input").addEventListener("input", e=>{
     const p=e.target.value/1000;
     $("#seek-fill").style.width=(p*100)+"%";
-    if (curSource==="soundcloud"){ if(scWidget) scWidget.getDuration(d=>scWidget.seekTo(p*(d||0))); }
+    if (curSource==="soundcloud"){
+      if (curScMode==="native"){ if(scAudio && scAudio.duration) scAudio.currentTime = p*scAudio.duration; }
+      else if(scWidget) scWidget.getDuration(d=>scWidget.seekTo(p*(d||0)));
+    }
     else if (player && player.getDuration){ player.seekTo(p*(player.getDuration()||0), true); }
   });
 
