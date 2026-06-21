@@ -1,7 +1,7 @@
 {
   "name": "TEMPLE — Underground Music Archive",
   "short_name": "TEMPLE",
-  "description": "Brutalistischer Underground-Musik-Tempel — 30+ Genres, direkt abspielbar.",
+  "description": "Brutalistischer Underground-Musik-Tempel — 33 Genres, direkt abspielbar.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -9,6 +9,9 @@
   "theme_color": "#000000",
   "lang": "de",
   "icons": [
-    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]
 }

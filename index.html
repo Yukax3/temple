@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://temple-taupe-three.vercel.app/">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="apple-touch-icon" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,13 +23,16 @@
 <meta property="og:title" content="TEMPLE — Underground Music Archive">
 <meta property="og:description" content="Brutalistischer Musik-Tempel: tausende Tracks aus 30+ Genres, direkt abspielbar. Goa bis Doom, Reggae bis Satire.">
 <meta property="og:url" content="https://temple-taupe-three.vercel.app/">
-<meta property="og:image" content="https://temple-taupe-three.vercel.app/og.svg">
+<meta property="og:image" content="https://temple-taupe-three.vercel.app/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:locale" content="de_DE">
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="TEMPLE — Underground Music Archive">
 <meta name="twitter:description" content="Brutalistischer Musik-Tempel: tausende Tracks aus 30+ Genres, direkt abspielbar.">
-<meta name="twitter:image" content="https://temple-taupe-three.vercel.app/og.svg">
+<meta name="twitter:image" content="https://temple-taupe-three.vercel.app/og.png">
 <!-- Structured data -->
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"TEMPLE","alternateName":"TEMPLE Underground Music Archive","url":"https://temple-taupe-three.vercel.app/","description":"Brutalistischer Underground-Musik-Tempel mit tausenden Tracks aus 30+ Genres, direkt abspielbar.","inLanguage":"de"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -817,16 +820,16 @@ const GENRE_RULES = [
   ["sleeping pandora","Psybient / Psychill"], ["liquify","Psybient / Psychill"],
   ["the psychedelic muse","Psybient / Psychill"], ["cosmic soundwaves","Psybient / Psychill"],
   ["mescalito","Psybient / Psychill"], ["l@g","Psybient / Psychill"], ["chillgressive","Psybient / Psychill"],
-  ["mantra for hybrids","Psybient / Psychill"], ["loscil","Ambient / IDM"],
-  ["steve hauschildt","Ambient / IDM"], ["soundscape hub","Ambient / IDM"], ["takeo suzuki","Ambient / IDM"],
-  ["ambient buddhism","Ambient / IDM"], ["vpg ","Ambient / IDM"], ["boards of canada","Ambient / IDM"],
-  ["aphex twin","Ambient / IDM"], ["autechre","Ambient / IDM"], ["grouper","Ambient / IDM"],
-  ["steve brenner","Ambient / IDM"], ["kenichiro isoda","Ambient / IDM"], ["dan caine","Ambient / IDM"],
-  ["432hz meditation","Ambient / IDM"], ["meditation","Ambient / IDM"], ["relax your mind","Ambient / IDM"],
-  ["peaceful solitude","Ambient / IDM"], ["sleep mix","Ambient / IDM"], ["ambient","Ambient / IDM"],
-  ["drone","Ambient / IDM"], ["macroblank","Ambient / IDM"], ["vapor memory","Ambient / IDM"],
-  ["home : odyssey","Ambient / IDM"], ["loscil","Ambient / IDM"], ["bonobo","Downtempo / Trip-Hop"],
-  ["quantic","Downtempo / Trip-Hop"], ["gramatik","Downtempo / Trip-Hop"],
+  ["mantra for hybrids","Psybient / Psychill"], ["savvas kalt","Psybient / Psychill"],
+  ["loscil","Ambient / IDM"], ["steve hauschildt","Ambient / IDM"], ["soundscape hub","Ambient / IDM"],
+  ["takeo suzuki","Ambient / IDM"], ["ambient buddhism","Ambient / IDM"], ["vpg ","Ambient / IDM"],
+  ["boards of canada","Ambient / IDM"], ["aphex twin","Ambient / IDM"], ["autechre","Ambient / IDM"],
+  ["grouper","Ambient / IDM"], ["steve brenner","Ambient / IDM"], ["kenichiro isoda","Ambient / IDM"],
+  ["dan caine","Ambient / IDM"], ["432hz meditation","Ambient / IDM"], ["meditation","Ambient / IDM"],
+  ["relax your mind","Ambient / IDM"], ["peaceful solitude","Ambient / IDM"], ["sleep mix","Ambient / IDM"],
+  ["ambient","Ambient / IDM"], ["drone","Ambient / IDM"], ["macroblank","Ambient / IDM"],
+  ["vapor memory","Ambient / IDM"], ["home : odyssey","Ambient / IDM"], ["loscil","Ambient / IDM"],
+  ["bonobo","Downtempo / Trip-Hop"], ["quantic","Downtempo / Trip-Hop"], ["gramatik","Downtempo / Trip-Hop"],
   ["hugo kant","Downtempo / Trip-Hop"], ["skinshape","Downtempo / Trip-Hop"],
   ["telepopmusik","Downtempo / Trip-Hop"], ["caribou","Downtempo / Trip-Hop"],
   ["jamie xx","Downtempo / Trip-Hop"], ["gaslamp killer","Downtempo / Trip-Hop"],
@@ -923,10 +926,10 @@ const GENRE_RULES = [
   ["natarajasana","Healing / Meditation"], ["sound healing","Healing / Meditation"],
   ["healing song","Healing / Meditation"], ["healing earth","Healing / Meditation"],
   ["healing ocean","Healing / Meditation"], ["relaxation ocean","Healing / Meditation"],
-  ["liquid mind","Healing / Meditation"], ["savvas kalt","Healing / Meditation"],
-  ["el buho","Organic / Ethno"], ["el búho","Organic / Ethno"], ["joaquin cornejo","Organic / Ethno"],
-  ["joaquín cornejo","Organic / Ethno"], ["seba campos","Organic / Ethno"], [" yuri","Organic / Ethno"],
-  ["aguila real","Organic / Ethno"], ["águila real","Organic / Ethno"], ["lagartijeando","Organic / Ethno"],
+  ["liquid mind","Healing / Meditation"], ["el buho","Organic / Ethno"], ["el búho","Organic / Ethno"],
+  ["joaquin cornejo","Organic / Ethno"], ["joaquín cornejo","Organic / Ethno"],
+  ["seba campos","Organic / Ethno"], [" yuri","Organic / Ethno"], ["aguila real","Organic / Ethno"],
+  ["águila real","Organic / Ethno"], ["lagartijeando","Organic / Ethno"],
   ["desert dwellers","Organic / Ethno"], ["danit","Organic / Ethno"], ["mahumen","Organic / Ethno"],
   ["lido pimienta","Organic / Ethno"], ["pablo rozas","Organic / Ethno"], ["nibana","Organic / Ethno"],
   ["aware","Organic / Ethno"], ["awarë","Organic / Ethno"], ["deya dova","Organic / Ethno"],
@@ -1270,7 +1273,16 @@ function startPlay(e, noOpen){
   isPlaying = true;
   updateBar(e);
   if (curSource === "soundcloud") playSC(e); else playYT(e);
-  render();
+  // PERF: ist die Zeile schon im DOM (offene Sektion)? -> nur Highlight umsetzen statt das ganze
+  // Index-DOM + FLAT neu zu bauen. Spart bei jedem Track-Wechsel (v.a. Auto-Next) viel Arbeit.
+  const sel = '.row[data-uid="' + curId.replace(/["\\]/g,"\\$&") + '"]';
+  const row = document.querySelector(sel);
+  if (row){
+    $$(".row.is-active").forEach(r=> r.classList.remove("is-active","playing"));
+    row.classList.add("is-active"); if (isPlaying) row.classList.add("playing");
+  } else {
+    render();   // Track liegt in geschlossener/anderer Sektion -> einmalig voll rendern (öffnet sie)
+  }
 }
 
 // YouTube: Player wird LAZY mit konkreter ID erzeugt (sonst kein iframe)
@@ -1387,8 +1399,10 @@ function next(){
   if (!FLAT.length) return;
   if (repeat && curId){ playUid(curId); return; }
   let i = curIndex();
-  if (shuffle) i = Math.floor(Math.random()*FLAT.length);
-  else i = (i+1) % FLAT.length;
+  if (shuffle){
+    if (FLAT.length>1){ do { i = Math.floor(Math.random()*FLAT.length); } while (uid(FLAT[i].t)===curId); }  // nicht denselben Track doppeln
+    else i = 0;
+  } else i = (i+1) % FLAT.length;
   playUid(uid(FLAT[i].t));
 }
 function prev(){
