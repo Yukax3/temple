@@ -358,6 +358,29 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 
 .admin__sub{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line-2);padding-bottom:8px;margin:34px 0 16px}
 
+/* ===== PRO / SUPPORT ===== */
+.pro__panel{max-width:560px}
+.pro__perks{list-style:none;margin:6px 0 26px;padding:0}
+.pro__perks li{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.45}
+.pro__perks li b{color:var(--fg)}
+.pro__perks .k{color:var(--accent);font-family:"Space Mono",monospace;font-size:13px;flex:none;width:18px}
+.pro__perks .soon{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);border:1px solid var(--line-2);padding:1px 6px;margin-left:6px;white-space:nowrap}
+.pro__price{font-weight:700;font-size:15px;letter-spacing:.04em}
+.pro__price b{color:var(--accent)}
+.pro__or{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2);text-align:center;margin:18px 0 14px}
+.foot__pro{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);cursor:pointer;border:1px solid transparent}
+.foot__pro:hover{text-decoration:underline}
+.top__support{
+  margin-left:auto;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent);padding:8px 14px;white-space:nowrap;transition:.12s;
+}
+.top__support:hover{background:var(--accent);color:var(--accent-ink)}
+.is-pro .top__support{color:var(--fg);border-color:var(--line-2)}
+.is-pro .top__support::before{content:"✓ "}
+.is-pro .foot__pro::after{content:" ✓"}
+.badge-pro{display:none;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.14em;color:var(--accent-ink);background:var(--accent);padding:2px 6px;margin-left:8px;vertical-align:middle}
+.is-pro .badge-pro{display:inline-block}
+
 /* manage genres */
 .gman{display:flex;flex-wrap:wrap;gap:8px}
 .gman__chip{
@@ -399,7 +422,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input id="search" type="search" placeholder="suche / filter — titel, künstler, genre…" aria-label="Musik durchsuchen" autocomplete="off">
     </div>
-    <div class="top__spacer"></div>
+    <button class="top__support" id="open-pro-top" type="button" aria-label="Support · Pro">♥ Support</button>
   </div>
 </header>
 
@@ -433,8 +456,8 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 <!-- ============ FOOTER ============ -->
 <footer class="foot">
   <div class="wrap foot__row">
-    <span>TEMPLE — UNDERGROUND ARCHIVE</span>
-    <span>KEIN UPLOAD · NUR LINKS · NUR YOUTUBE-EMBEDS · <span id="year"></span></span>
+    <span>TEMPLE — UNDERGROUND ARCHIVE<span class="badge-pro" id="badge-pro">PRO</span></span>
+    <span><span class="foot__pro" id="open-pro" role="button" tabindex="0">Support · Pro</span> · NUR LINKS · NUR EMBEDS · <span id="year"></span></span>
   </div>
 </footer>
 
@@ -548,6 +571,43 @@ https://www.youtube.com/playlist?list=…"></textarea>
   </div>
 </div>
 
+<!-- ============ PRO / SUPPORT ============ -->
+<div class="admin" id="pro" role="dialog" aria-modal="true" aria-label="Support · Pro">
+  <div class="admin__panel pro__panel">
+    <div class="admin__top">
+      <h2>SUPPORT <b>TEMPLE</b></h2>
+      <button class="admin__close" id="close-pro">Schliessen [ESC]</button>
+    </div>
+
+    <p class="note" style="font-size:13px;margin-bottom:18px">Alles bleibt frei hörbar — für immer. Wer den Tempel am Leben hält, schaltet die Komfort-Features frei und bekommt ein Dankeschön.</p>
+
+    <ul class="pro__perks">
+      <li><span class="k">✓</span><div><b>Supporter-Badge</b> — sichtbares „PRO" + ewiger Dank.</div></li>
+      <li><span class="k">~</span><div><b>Echter Crossfade</b> — nahtlose Überblendung zwischen Tracks.<span class="soon">in Arbeit</span></div></li>
+      <li><span class="k">~</span><div><b>Eigene Playlists</b> — speichern &amp; wiederfinden.<span class="soon">in Arbeit</span></div></li>
+    </ul>
+
+    <div class="pro__price">Lifetime · <b>3 €</b> · einmalig, kein Abo</div>
+
+    <div class="btnrow" style="margin-top:16px">
+      <a class="btn btn--accent" id="pro-buy" href="#" target="_blank" rel="noopener">Mit Karte kaufen</a>
+      <a class="btn btn--ghost" id="pro-paypal" href="#" target="_blank" rel="noopener">Lieber per PayPal</a>
+    </div>
+    <div class="note">Nach dem Kauf bekommst du einen <b>Lizenz-Key</b> (Karte: sofort; PayPal: per Mail). Hier unten eintragen.</div>
+
+    <div class="pro__or">— Key einlösen —</div>
+    <div class="fld">
+      <label class="fld__lab" for="pro-key">Lizenz-Key</label>
+      <div class="row2">
+        <input id="pro-key" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off" spellcheck="false">
+        <button class="btn" id="pro-redeem" style="flex:none">Freischalten</button>
+      </div>
+    </div>
+    <div class="stat" id="pro-stat"></div>
+    <div class="note" id="pro-active" style="display:none;color:var(--accent)">✓ PRO ist auf diesem Gerät aktiv. Danke, dass du den Tempel trägst.</div>
+  </div>
+</div>
+
 <script>
 /* ====================================================================
    TEMPLE — vanilla app
@@ -571,6 +631,36 @@ const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const esc = s => (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "x";
 const fmt = t => { t=Math.max(0,Math.floor(t||0)); const m=Math.floor(t/60), s=t%60; return m+":"+String(s).padStart(2,"0"); };
+
+/* ---------- PRO / SUPPORT ----------------------------------------
+   Bezahl-Links hier eintragen, sobald das Lemon-Squeezy-Produkt + PayPal stehen.
+   Lizenz-Check läuft serverseitig über /api/license (validiert LS-Key). */
+const PRO = {
+  buyUrl:    "",   // z.B. "https://DEINSTORE.lemonsqueezy.com/buy/XXXXXXXX"  (One-time-Produkt mit License Keys)
+  paypalUrl: "",   // z.B. "https://paypal.me/DEINNAME/3"
+};
+const PRO_LS = "temple_pro";
+function isPro(){ try{ return !!localStorage.getItem(PRO_LS); }catch(_){ return false; } }
+function setPro(key){ try{ localStorage.setItem(PRO_LS, key||"1"); }catch(_){} applyProState(); }
+function applyProState(){
+  const on = isPro();
+  document.body.classList.toggle("is-pro", on);
+  const act = document.getElementById("pro-active"); if (act) act.style.display = on ? "block" : "none";
+}
+function openPro(){ document.getElementById("pro").classList.add("open"); const k=document.getElementById("pro-key"); if(k) setTimeout(()=>k.focus(),40); }
+function closePro(){ document.getElementById("pro").classList.remove("open"); }
+async function redeemLicense(){
+  const inp = document.getElementById("pro-key");
+  const key = (inp.value||"").trim();
+  if (!key){ setStat("#pro-stat","Bitte Key eingeben.","err"); return; }
+  setStat("#pro-stat","Prüfe Lizenz…","work");
+  try{
+    const r = await fetch("/api/license", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ key }) });
+    const j = await r.json().catch(()=>({}));
+    if (r.ok && j.ok){ setPro(key); setStat("#pro-stat","✓ Freigeschaltet — danke!","ok"); }
+    else setStat("#pro-stat","✗ "+(j.error || ("ungültig (HTTP "+r.status+")")),"err");
+  }catch(e){ setStat("#pro-stat","✗ Netzwerkfehler: "+(e&&e.message||e),"err"); }
+}
 
 /* ---------- genre classifier (heuristik, kein API-key) ---------- */
 /* Reihenfolge = Priorität bei Gleichstand. Stichwörter frei erweiterbar. */
@@ -596,23 +686,24 @@ const GENRE_RULES = [
   ["comet is coming","Downtempo / Trip-Hop"], ["forest swords","Downtempo / Trip-Hop"],
   ["neelix","Goa / Psytrance"], ["unlogix","Goa / Psytrance"], ["daso","Techno / House"],
   ["hotel pools","Pop / Synthwave"], ["oddling","Pop / Synthwave"], ["ivoxygen","Pop / Synthwave"],
-  ["mokalamity","Reggae / Dub"], ["electronic system","Pop / Synthwave"], ["john summit","Techno / House"],
-  ["fred again","Techno / House"], ["fatboy slim","Pop / Synthwave"], ["oliver tree","Indie / Dream-Pop"],
-  ["goddard.","Techno / House"], ["high contrast","Liquid DnB"], ["dj marky","Liquid DnB"],
-  ["london elektricity","Liquid DnB"], ["netsky","Liquid DnB"], ["etherwood","Liquid DnB"],
-  ["keeno","Liquid DnB"], ["lenzman","Liquid DnB"], ["bcee","Liquid DnB"], ["hybrid minds","Liquid DnB"],
-  ["fred v","Liquid DnB"], ["grafix","Liquid DnB"], ["maduk","Liquid DnB"], ["feint","Liquid DnB"],
-  ["koven","Liquid DnB"], ["technimatic","Liquid DnB"], ["whiney","Liquid DnB"], ["blu mar ten","Liquid DnB"],
-  ["hybrid theory","Liquid DnB"], ["liquid dnb","Liquid DnB"], ["liquid funk","Liquid DnB"],
-  ["noisia","Neurofunk"], ["phace","Neurofunk"], ["mefjus","Neurofunk"], ["black sun empire","Neurofunk"],
-  ["annix","Neurofunk"], ["billain","Neurofunk"], ["current value","Neurofunk"], ["maztek","Neurofunk"],
-  ["the upbeats","Neurofunk"], ["prolix","Neurofunk"], ["neurofunk","Neurofunk"],
-  ["agressor bunx","Neurofunk"], ["macky gee","Jump Up"], ["skepsis","Jump Up"], ["kanine","Jump Up"],
-  ["hedex","Jump Up"], ["dj hazard","Jump Up"], ["original sin","Jump Up"], ["benny l","Jump Up"],
-  ["sub zero","Jump Up"], ["dutta","Jump Up"], ["jump up","Jump Up"], ["windhand","Stoner / Doom"],
-  ["meiko","Chill / Lounge"], ["leave the lights on","Chill / Lounge"], ["omer balik","Chill / Lounge"],
-  ["omer balık","Chill / Lounge"], ["coffee blues","Chill / Lounge"], ["bon iver","Chill / Lounge"],
-  ["daniel norgren","Akustik / Folk"], ["hermanos gutierrez","Akustik / Folk"],
+  ["mokalamity","Reggae / Dub"], ["electronic system","Pop / Synthwave"], ["ziqooh","Freetekno / Tekno"],
+  ["hopeless desires","Freetekno / Tekno"], ["alien talk","Freetekno / Tekno"],
+  ["moldetek","Freetekno / Tekno"], ["john summit","Techno / House"], ["fred again","Techno / House"],
+  ["fatboy slim","Pop / Synthwave"], ["oliver tree","Indie / Dream-Pop"], ["goddard.","Techno / House"],
+  ["high contrast","Liquid DnB"], ["dj marky","Liquid DnB"], ["london elektricity","Liquid DnB"],
+  ["netsky","Liquid DnB"], ["etherwood","Liquid DnB"], ["keeno","Liquid DnB"], ["lenzman","Liquid DnB"],
+  ["bcee","Liquid DnB"], ["hybrid minds","Liquid DnB"], ["fred v","Liquid DnB"], ["grafix","Liquid DnB"],
+  ["maduk","Liquid DnB"], ["feint","Liquid DnB"], ["koven","Liquid DnB"], ["technimatic","Liquid DnB"],
+  ["whiney","Liquid DnB"], ["blu mar ten","Liquid DnB"], ["hybrid theory","Liquid DnB"],
+  ["liquid dnb","Liquid DnB"], ["liquid funk","Liquid DnB"], ["noisia","Neurofunk"], ["phace","Neurofunk"],
+  ["mefjus","Neurofunk"], ["black sun empire","Neurofunk"], ["annix","Neurofunk"], ["billain","Neurofunk"],
+  ["current value","Neurofunk"], ["maztek","Neurofunk"], ["the upbeats","Neurofunk"], ["prolix","Neurofunk"],
+  ["neurofunk","Neurofunk"], ["agressor bunx","Neurofunk"], ["macky gee","Jump Up"], ["skepsis","Jump Up"],
+  ["kanine","Jump Up"], ["hedex","Jump Up"], ["dj hazard","Jump Up"], ["original sin","Jump Up"],
+  ["benny l","Jump Up"], ["sub zero","Jump Up"], ["dutta","Jump Up"], ["jump up","Jump Up"],
+  ["windhand","Stoner / Doom"], ["meiko","Chill / Lounge"], ["leave the lights on","Chill / Lounge"],
+  ["omer balik","Chill / Lounge"], ["omer balık","Chill / Lounge"], ["coffee blues","Chill / Lounge"],
+  ["bon iver","Chill / Lounge"], ["daniel norgren","Akustik / Folk"], ["hermanos gutierrez","Akustik / Folk"],
   ["hermanos gutiérrez","Akustik / Folk"], ["estas tonne","Akustik / Folk"], ["estás tonné","Akustik / Folk"],
   ["jose gonzalez","Akustik / Folk"], ["josé gonzález","Akustik / Folk"], ["ben howard","Akustik / Folk"],
   ["keaton henson","Akustik / Folk"], ["gnarls barkley","Indie / Dream-Pop"],
@@ -1269,6 +1360,8 @@ function reflectPlay(){
   $("#btn-play").setAttribute("aria-label", isPlaying?"Pause":"Abspielen");
   $$(".row.is-active").forEach(r=> r.classList.toggle("playing", isPlaying));
   $("#player").classList.toggle("playing", isPlaying);
+  // iOS: ohne playbackState hält das System die Audio-Session beim Sperren (Standby) NICHT -> Ton stoppt
+  if ("mediaSession" in navigator){ try{ navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused"; }catch(_){} }
 }
 function buildViz(){
   const v = $("#viz"); if(!v || v.children.length) return;
@@ -1346,6 +1439,10 @@ function startTicker(){
       if (curScMode === "native"){
         if (!scAudio) return;
         updateTime(scAudio.currentTime || 0, scAudio.duration || 0);
+        // iOS Lock-Screen lebendig halten: Position melden
+        if ("mediaSession" in navigator && navigator.mediaSession.setPositionState && scAudio.duration){
+          try{ navigator.mediaSession.setPositionState({ duration:scAudio.duration, position:Math.min(scAudio.currentTime,scAudio.duration), playbackRate:1 }); }catch(_){}
+        }
       } else {
         if (!scWidget) return;
         scWidget.getPosition(p=>{ scPos=(p||0)/1000; scWidget.getDuration(d=>updateTime(scPos,(d||0)/1000)); });
@@ -1609,6 +1706,20 @@ function bind(){
   $("#btn-clearstage").onclick = ()=>{ STAGE=[]; renderStage(); setStat("#fetch-stat","",""); };
   $("#btn-addg").onclick = ()=>{ const v=$("#newg").value.trim(); if(v){ ensureGenre(v); $("#newg").value=""; saveLocal(); renderGman(); render(); } };
   $("#newg").addEventListener("keydown",e=>{ if(e.key==="Enter") $("#btn-addg").click(); });
+
+  // pro / support
+  $("#open-pro").onclick = openPro;
+  $("#open-pro-top").onclick = openPro;
+  $("#open-pro").addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openPro(); } });
+  $("#close-pro").onclick = closePro;
+  $("#pro").addEventListener("mousedown", e=>{ if(e.target===$("#pro")) closePro(); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("#pro").classList.contains("open")) closePro(); });
+  $("#pro-redeem").onclick = redeemLicense;
+  $("#pro-key").addEventListener("keydown", e=>{ if(e.key==="Enter") redeemLicense(); });
+  // Bezahl-Links nur zeigen, wenn konfiguriert
+  const buy=$("#pro-buy"), pp=$("#pro-paypal");
+  if (PRO.buyUrl) buy.href=PRO.buyUrl; else buy.style.display="none";
+  if (PRO.paypalUrl) pp.href=PRO.paypalUrl; else pp.style.display="none";
 }
 function routeHash(){ if (location.hash==="#"+ADMIN_KEY) openAdmin(); }
 
@@ -1618,8 +1729,16 @@ async function boot(){
   buildViz();
   await loadLibrary();
   bind();
+  applyProState();
   render();
   routeHash();   // Player-APIs (YT/SC) werden erst beim ersten Play geladen → schnellerer Initial-Load
+  // Support einmal pro Gerät dezent aufgehen lassen (nur für Nicht-Pro, nicht nervend)
+  try{
+    if (!isPro() && !localStorage.getItem("temple_pro_seen")){
+      localStorage.setItem("temple_pro_seen","1");
+      setTimeout(()=>{ if(!document.getElementById("admin").classList.contains("open")) openPro(); }, 2600);
+    }
+  }catch(_){}
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});   // PWA / installierbar
 }
 boot();

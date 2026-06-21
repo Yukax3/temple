@@ -1,6 +1,6 @@
 // TEMPLE Service-Worker — App-Shell offline-fähig, Daten network-first.
 // (YouTube/SoundCloud werden NIE gecacht — nur eigene Origin-GETs.)
-const CACHE = "temple-v1";
+const CACHE = "temple-v2";   // bei jedem index.html/Shell-Update hochzählen -> Nutzer bekommen die neue Version
 const SHELL = ["/", "/index.html", "/favicon.svg", "/manifest.webmanifest", "/playlists.json"];
 
 self.addEventListener("install", e => {
