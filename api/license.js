@@ -18,6 +18,14 @@ export default async function handler(req, res){
   const key = ((body && body.key) || "").toString().trim();
   if (!key) return res.status(400).json({ ok:false, error:"key fehlt" });
 
+  // Owner-/Test-Keys: serverseitig in Vercel setzen, niemals hart ins Repo schreiben.
+  // Env-Var: TEMPLE_OWNER_KEYS="KEY1,KEY2"
+  const ownerKeys = (process.env.TEMPLE_OWNER_KEYS || "")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+  if (ownerKeys.includes(key)) return res.status(200).json({ ok:true, owner:true });
+
   try{
     const r = await fetch("https://api.lemonsqueezy.com/v1/licenses/validate", {
       method:"POST",
