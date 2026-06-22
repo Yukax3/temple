@@ -167,7 +167,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 .section.open .tracks{display:block}
 .row{
   display:grid;
-  grid-template-columns:42px 1fr 36px 34px;
+  grid-template-columns:42px 1fr 36px 34px 34px;
   align-items:center;gap:14px;
   padding:12px 10px;margin:0 -10px;
   border-top:1px solid var(--line);
@@ -189,9 +189,11 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   color:var(--muted-2);justify-self:end;
 }
 .row[data-kind="playlist"] .row__tag{color:var(--accent)}
-.row__fav{justify-self:end;width:28px;height:28px;border:1px solid var(--line-2);color:var(--muted-2);font-size:17px;line-height:1;display:grid;place-items:center;transition:.12s}
-.row__fav:hover{border-color:var(--accent);color:var(--accent)}
+.row__fav,.row__queue{justify-self:end;width:28px;height:28px;border:1px solid var(--line-2);color:var(--muted-2);font-size:17px;line-height:1;display:grid;place-items:center;transition:.12s}
+.row__queue{font-family:"Space Mono",monospace;font-size:16px}
+.row__fav:hover,.row__queue:hover{border-color:var(--accent);color:var(--accent)}
 .row__fav.on{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.row__queue.on{border-color:var(--accent);color:var(--accent)}
 .row__eq{display:none;justify-self:start;width:14px;height:14px}
 .row.is-active{background:#0c0c0c}
 .row.is-active .row__title{color:var(--accent)}
@@ -389,7 +391,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 .thm:hover{transform:scale(1.08)}
 .thm.on{border-color:var(--fg);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--fg)}
 .sleeprow{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
-.favbox{border-top:1px solid var(--line);margin-top:8px}
+.favbox{border-top:1px solid var(--line);margin-top:8px;max-height:260px;overflow:auto}
 .favitem{display:grid;grid-template-columns:1fr 34px;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
 .favitem__title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .favitem__sub{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -535,6 +537,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 <div id="scwrap" aria-hidden="true" style="position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;opacity:0;pointer-events:none;z-index:-1"><iframe id="scplayer" allow="autoplay" frameborder="0" scrolling="no"></iframe></div>
 <!-- Natives SC-Audio: spielt direkte Stream-URL (via /api/stream) -> läuft im iOS-Hintergrund/Lock-Screen weiter. src = stilles WAV für iOS-Geste-Unlock -->
 <audio id="scaudio" preload="none" playsinline src="data:audio/wav;base64,UklGRiwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQgAAACAgICAgICAgA=="></audio>
+<audio id="scpreload" preload="none" playsinline></audio>
 
 <!-- ============ ADMIN HUB ============ -->
 <div class="admin" id="admin" role="dialog" aria-modal="true" aria-label="Admin Hub">
@@ -657,6 +660,21 @@ https://www.youtube.com/playlist?list=…"></textarea>
       <span class="note" id="fav-stat" style="margin-top:0"></span>
     </div>
     <div class="favbox" id="fav-list"></div>
+
+    <div class="admin__sub">Queue</div>
+    <div class="btnrow" style="margin-bottom:10px">
+      <button class="btn btn--accent" id="play-queue">Queue starten</button>
+      <button class="btn btn--ghost" id="clear-queue">Leeren</button>
+      <span class="note" id="queue-stat" style="margin-top:0"></span>
+    </div>
+    <div class="favbox" id="queue-list"></div>
+
+    <div class="admin__sub">History</div>
+    <div class="btnrow" style="margin-bottom:10px">
+      <button class="btn btn--ghost" id="clear-history">History leeren</button>
+      <span class="note" id="history-stat" style="margin-top:0"></span>
+    </div>
+    <div class="favbox" id="history-list"></div>
   </div>
 </div>
 
@@ -750,10 +768,16 @@ function renderPanel(){
   document.querySelectorAll("#panel-sleep [data-sleep]").forEach(b=> b.classList.toggle("on", +b.dataset.sleep === sleepMin));
   const st = document.getElementById("sleep-stat");
   if (st){ const l=sleepLeft(); st.textContent = sleepMin ? ("läuft — noch ~"+l+" Min") : "aus"; }
+  const renderMini = (items, action, empty)=> items.length ? items.slice(0,80).map(t=>{ const u=uid(t); return `<div class="favitem"><div><div class="favitem__title">${esc(t.title||t.id)}</div><div class="favitem__sub">${esc(t.artist||"—")}</div></div><button class="favitem__x" ${action}="${esc(u)}" title="Entfernen">×</button></div>`; }).join("") : `<div class="empty" style="padding:16px 0">// ${empty}</div>`;
   const favs = favTracks();
   const fs = document.getElementById("fav-stat"); if (fs) fs.textContent = favs.length ? (favs.length + " gespeichert") : "noch leer";
-  const fl = document.getElementById("fav-list");
-  if (fl) fl.innerHTML = favs.length ? favs.slice(0,80).map(t=>{ const u=uid(t); return `<div class="favitem"><div><div class="favitem__title">${esc(t.title||t.id)}</div><div class="favitem__sub">${esc(t.artist||"—")}</div></div><button class="favitem__x" data-unfav="${esc(u)}" title="Entfernen">×</button></div>`; }).join("") : '<div class="empty" style="padding:16px 0">// keine Favoriten</div>';
+  const fl = document.getElementById("fav-list"); if (fl) fl.innerHTML = renderMini(favs, "data-unfav", "keine Favoriten");
+  const q = queueTracks();
+  const qs = document.getElementById("queue-stat"); if (qs) qs.textContent = q.length ? (q.length + " in Queue") : "leer";
+  const ql = document.getElementById("queue-list"); if (ql) ql.innerHTML = renderMini(q, "data-unqueue", "Queue leer");
+  const h = historyTracks();
+  const hs = document.getElementById("history-stat"); if (hs) hs.textContent = h.length ? (h.length + " zuletzt") : "leer";
+  const hl = document.getElementById("history-list"); if (hl) hl.innerHTML = renderMini(h, "data-unhist", "History leer");
 }
 
 /* ---------- PRO-FEATURE: Favoriten ---------- */
@@ -771,6 +795,23 @@ function favTracks(){
   LIB.genres.forEach(g=> g.tracks.forEach(t=>{ if (s.has(uid(t))) out.push(t); }));
   return out;
 }
+function trackByUid(u){ let found=null; LIB.genres.some(g=>g.tracks.some(t=>{ if(uid(t)===u){ found=t; return true; } return false; })); return found; }
+function idsLS(k){ try{ return JSON.parse(localStorage.getItem(k)||"[]").filter(Boolean); }catch(_){ return []; } }
+function setIdsLS(k, ids){ try{ localStorage.setItem(k, JSON.stringify(ids)); }catch(_){} }
+function queueIds(){ return idsLS("temple_queue"); }
+function queueTracks(){ return queueIds().map(trackByUid).filter(Boolean); }
+function addQueue(u){
+  if (!isPro()){ openBuy(); return; }
+  const ids = queueIds().filter(x=>x!==u); ids.push(u); setIdsLS("temple_queue", ids.slice(-100));
+  renderPanel(); document.querySelectorAll(`[data-queue="${u.replace(/["\\]/g,"\\$&")}"]`).forEach(b=>b.classList.add("on"));
+  prefetchNext();
+}
+function removeQueue(u){ setIdsLS("temple_queue", queueIds().filter(x=>x!==u)); renderPanel(); render(); }
+function shiftQueue(){ const ids=queueIds(); const u=ids.shift(); setIdsLS("temple_queue", ids); return u; }
+function historyIds(){ return idsLS("temple_history"); }
+function historyTracks(){ return historyIds().map(trackByUid).filter(Boolean); }
+function addHistory(u){ if(!u) return; const ids=historyIds().filter(x=>x!==u); ids.unshift(u); setIdsLS("temple_history", ids.slice(0,80)); }
+function removeHistory(u){ setIdsLS("temple_history", historyIds().filter(x=>x!==u)); renderPanel(); }
 async function redeemLicense(){
   const inp = document.getElementById("pro-key");
   const key = (inp.value||"").trim();
@@ -1254,7 +1295,8 @@ let volume = 100, muted = false;
 let fadeMul = 1, fadeOn = true; const FADE = 6;   // weiche Ein-/Ausblendung (Sek)
 let ytApiReady = false, ytReady = false, player = null, ticker = null;
 let scApiReady = false, scReady = false, scWidget = null, scPos = 0;   // SoundCloud-Engine
-let scAudio = null, curScMode = null;   // natives <audio> für SC; curScMode = "native" | "widget" pro Track
+let scAudio = null, scPreload = null, preloadedUid = null;   // natives <audio> + zweiter Preload-Player für SC-Gapless
+let curScMode = null;   // "native" | "widget" pro Track
 let scNative = !/[?&]widget\b/.test(location.search);   // ?widget = altes Widget erzwingen (zum Vergleich)
 let ytLoading = false, scLoading = false;   // Player-APIs erst bei Bedarf laden
 let curSource = "youtube", pending = null;
@@ -1324,6 +1366,7 @@ function rowsHTML(matches){
       <svg class="row__eq eq" viewBox="0 0 14 14" aria-hidden="true"><rect x="1" y="3" width="3" height="11"/><rect x="5.5" y="3" width="3" height="11"/><rect x="10" y="3" width="3" height="11"/></svg>
       <div class="row__main"><div class="row__title">${esc(t.title||t.id)}</div><div class="row__artist">${esc(t.artist||"—")}</div></div>
       <span class="row__tag">${(t.kind==='playlist')?'PLAYLIST':''}</span>
+      <button class="row__queue${queueIds().includes(u)?' on':''}" data-queue="${esc(u)}" aria-label="In Queue" title="Als Nächstes">+</button>
       <button class="row__fav${isFav(u)?' on':''}" data-fav="${esc(u)}" aria-label="Favorit" title="Favorit">♥</button>
     </div>`;
   }).join("");
@@ -1390,7 +1433,9 @@ function findEntry(u){ return FLAT.find(e=>uid(e.t)===u) || null; }
 function playUid(u){ const e = findEntry(u); if (e) startPlay(e); }
 
 function startPlay(e, noOpen){
-  curId = uid(e.t);
+  const nextId = uid(e.t);
+  if (curId && curId !== nextId) addHistory(curId);
+  curId = nextId;
   fadeMul = fadeOn ? 0 : 1;   // neuer Track blendet sanft ein
   if (e.genre && !noOpen) openGenres.add(e.genre);   // Randomizer öffnet die Sektion NICHT
   curSource = e.t.source || "youtube";
@@ -1458,12 +1503,23 @@ async function resolveStream(id){
   return j.url;
 }
 // Nächsten Track vorab auflösen -> Wechsel ist sofort (kein /api/stream-Warten)
+function predictedNextEntry(){
+  const qid = queueIds()[0];
+  if (qid){ const t=trackByUid(qid); if (t) return {t, genre:"Queue"}; }
+  if (shuffle || repeat || !FLAT.length) return null;
+  const i = curIndex(); if (i < 0) return null;
+  return FLAT[(i+1) % FLAT.length] || null;
+}
 function prefetchNext(){
-  if (shuffle || repeat || !FLAT.length) return;   // bei Zufall/Repeat ist „nächster" nicht vorhersagbar
-  const i = curIndex(); if (i < 0) return;
-  const nx = FLAT[(i+1) % FLAT.length];
-  if (nx && nx.t.source === "soundcloud" && /^\d+$/.test(String(nx.t.id))){
-    resolveStream(nx.t.id).catch(()=>{});   // nur vorwärmen
+  const nx = predictedNextEntry(); if (!nx) return;
+  const u = uid(nx.t);
+  if (nx.t.source === "soundcloud" && /^\d+$/.test(String(nx.t.id))){
+    resolveStream(nx.t.id).then(url=>{
+      if (!scPreload) scPreload = $("#scpreload");
+      if (!scPreload || preloadedUid === u) return;
+      scPreload.preload = "auto"; scPreload.src = url; preloadedUid = u;
+      try{ scPreload.load(); }catch(_){}
+    }).catch(()=>{});
   }
 }
 
@@ -1477,17 +1533,23 @@ async function playSCNative(e){
   try{ scAudio.src = SC_SILENT; scAudio.play().catch(()=>{}); }catch(_){}
   scReady = false;
   const myId = uid(e.t);
-  let url;
+  let url, usePreloaded = false;
   try{
-    url = await resolveStream(e.t.id);   // gecacht (Prefetch) -> oft sofort da
+    if (scPreload && preloadedUid === myId && scPreload.src){ url = scPreload.src; usePreloaded = true; }
+    else url = await resolveStream(e.t.id);   // gecacht (Prefetch) -> oft sofort da
   }catch(err){
     console.warn("SC nativ fehlgeschlagen -> Widget-Fallback:", err && err.message);
     if (curId === myId) playSCWidget(e);   // dieser Track nicht streambar (Go+?) -> Widget
     return;
   }
   if (curId !== myId) return;   // Nutzer hat inzwischen umgeschaltet
+  if (usePreloaded){
+    const old = scAudio; scAudio = scPreload; scPreload = old; preloadedUid = null;
+    try{ scPreload.pause(); scPreload.removeAttribute("src"); scPreload.load(); }catch(_){}
+  } else {
+    scAudio.src = url;
+  }
   scAudio.preload = "auto";    // BUFFER: laufenden Track aggressiv vorladen
-  scAudio.src = url;
   applyVolume();
   scAudio.play().then(()=>{ scReady = true; isPlaying = true; reflectPlay(); startTicker(); prefetchNext(); }).catch(()=>{});
 }
@@ -1543,6 +1605,8 @@ function togglePlay(){
 function curIndex(){ return FLAT.findIndex(e=>uid(e.t)===curId); }
 let shufHist = [];   // zuletzt gespielte uids (Shuffle ohne kurzfristige Wiederholungen)
 function next(){
+  const qid = shiftQueue();
+  if (qid){ const qt=trackByUid(qid); if(qt){ startPlay({t:qt, genre:"Queue"}, true); renderPanel(); return; } }
   if (!FLAT.length) return;
   if (repeat && curId){ playUid(curId); return; }
   let i = curIndex();
@@ -1814,6 +1878,8 @@ function bind(){
 
   // delegated: row = play, section head = auf-/zuklappen
   $("#index").addEventListener("click", e=>{
+    const qbtn = e.target.closest("[data-queue]");
+    if (qbtn){ e.preventDefault(); e.stopPropagation(); addQueue(qbtn.dataset.queue); return; }
     const fav = e.target.closest("[data-fav]");
     if (fav){ e.preventDefault(); e.stopPropagation(); toggleFav(fav.dataset.fav); return; }
     const row = e.target.closest(".row");
@@ -1823,6 +1889,8 @@ function bind(){
   });
   $("#index").addEventListener("keydown", e=>{
     if (e.key!=="Enter" && e.key!==" ") return;
+    const qbtn = e.target.closest("[data-queue]");
+    if (qbtn){ e.preventDefault(); addQueue(qbtn.dataset.queue); return; }
     const fav = e.target.closest("[data-fav]");
     if (fav){ e.preventDefault(); toggleFav(fav.dataset.fav); return; }
     const row = e.target.closest(".row");
@@ -1848,11 +1916,14 @@ function bind(){
   applyVolume();
   // natives SC-<audio>: Events nur greifen lassen, wenn aktuell nativ-SC läuft.
   // WICHTIG: den stillen data:-Unlock-Clip ignorieren (sonst feuert sein "ended" -> next() -> Schleife).
-  scAudio = $("#scaudio");
-  const scIsRealStream = ()=> !((scAudio.currentSrc||scAudio.src||"").startsWith("data:"));
-  scAudio.addEventListener("ended", ()=>{ if(curSource==="soundcloud" && curScMode==="native" && scIsRealStream()) next(); });
-  scAudio.addEventListener("play",  ()=>{ if(curSource==="soundcloud" && curScMode==="native" && scIsRealStream()){ isPlaying=true;  reflectPlay(); } });
-  scAudio.addEventListener("pause", ()=>{ if(curSource==="soundcloud" && curScMode==="native" && !scAudio.ended && scIsRealStream()){ isPlaying=false; reflectPlay(); } });
+  scAudio = $("#scaudio"); scPreload = $("#scpreload");
+  const bindSc = a=>{
+    const isReal = ()=> !((a.currentSrc||a.src||"").startsWith("data:"));
+    a.addEventListener("ended", ()=>{ if(a===scAudio && curSource==="soundcloud" && curScMode==="native" && isReal()) next(); });
+    a.addEventListener("play",  ()=>{ if(a===scAudio && curSource==="soundcloud" && curScMode==="native" && isReal()){ isPlaying=true;  reflectPlay(); } });
+    a.addEventListener("pause", ()=>{ if(a===scAudio && curSource==="soundcloud" && curScMode==="native" && !a.ended && isReal()){ isPlaying=false; reflectPlay(); } });
+  };
+  bindSc(scAudio); if (scPreload) bindSc(scPreload);
   // seek
   $("#seek-input").addEventListener("input", e=>{
     const p=e.target.value/1000;
@@ -1899,6 +1970,10 @@ function bind(){
   $("#propanel").addEventListener("click", e=>{
     const x = e.target.closest("[data-unfav]");
     if (x){ toggleFav(x.dataset.unfav); renderPanel(); return; }
+    const q = e.target.closest("[data-unqueue]");
+    if (q){ removeQueue(q.dataset.unqueue); return; }
+    const h = e.target.closest("[data-unhist]");
+    if (h){ removeHistory(h.dataset.unhist); return; }
   });
   $("#play-favs").onclick = ()=>{
     const favs = favTracks(); if (!favs.length) return;
@@ -1906,6 +1981,9 @@ function bind(){
     FLAT = []; LIB.genres.forEach(g=>g.tracks.forEach(t=>{ if (favIds.has(uid(t))) FLAT.push({t,genre:"Favoriten"}); }));
     closePanel(); startPlay(FLAT[0], true);
   };
+  $("#play-queue").onclick = ()=>{ const qid=shiftQueue(); const t=qid&&trackByUid(qid); if(t){ closePanel(); startPlay({t,genre:"Queue"}, true); renderPanel(); } };
+  $("#clear-queue").onclick = ()=>{ setIdsLS("temple_queue", []); renderPanel(); render(); };
+  $("#clear-history").onclick = ()=>{ setIdsLS("temple_history", []); renderPanel(); };
   $("#panel-themes").addEventListener("click", e=>{ const b=e.target.closest("[data-thm]"); if(b) setTheme(+b.dataset.thm); });
   $("#panel-sleep").addEventListener("click", e=>{ const b=e.target.closest("[data-sleep]"); if(b) setSleep(+b.dataset.sleep); });
 }
