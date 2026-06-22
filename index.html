@@ -167,7 +167,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 .section.open .tracks{display:block}
 .row{
   display:grid;
-  grid-template-columns:42px 1fr 36px;
+  grid-template-columns:42px 1fr 36px 34px;
   align-items:center;gap:14px;
   padding:12px 10px;margin:0 -10px;
   border-top:1px solid var(--line);
@@ -189,6 +189,9 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   color:var(--muted-2);justify-self:end;
 }
 .row[data-kind="playlist"] .row__tag{color:var(--accent)}
+.row__fav{justify-self:end;width:28px;height:28px;border:1px solid var(--line-2);color:var(--muted-2);font-size:17px;line-height:1;display:grid;place-items:center;transition:.12s}
+.row__fav:hover{border-color:var(--accent);color:var(--accent)}
+.row__fav.on{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
 .row__eq{display:none;justify-self:start;width:14px;height:14px}
 .row.is-active{background:#0c0c0c}
 .row.is-active .row__title{color:var(--accent)}
@@ -380,6 +383,21 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 .top__support:hover{background:var(--accent);color:var(--accent-ink)}
 .is-pro .top__support{color:var(--fg);border-color:var(--line-2)}
 .is-pro .top__support::before{content:"✓ "}
+/* Pro-Panel: Theme-Swatches + Sleep */
+.thmrow{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+.thm{width:34px;height:34px;border:2px solid var(--line-2);cursor:pointer;transition:.12s}
+.thm:hover{transform:scale(1.08)}
+.thm.on{border-color:var(--fg);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--fg)}
+.sleeprow{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+.favbox{border-top:1px solid var(--line);margin-top:8px}
+.favitem{display:grid;grid-template-columns:1fr 34px;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
+.favitem__title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.favitem__sub{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.favitem__x{width:28px;height:28px;border:1px solid var(--line-2);color:var(--muted);font-size:16px}
+.favitem__x:hover{border-color:#ff4d3d;color:#ff4d3d}
+.sleepb{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line-2);padding:9px 14px;transition:.12s}
+.sleepb:hover{color:var(--fg);border-color:var(--fg)}
+.sleepb.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
 .is-pro .foot__pro::after{content:" ✓"}
 .badge-pro{display:none;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.14em;color:var(--accent-ink);background:var(--accent);padding:2px 6px;margin-left:8px;vertical-align:middle}
 .is-pro .badge-pro{display:inline-block}
@@ -611,6 +629,37 @@ https://www.youtube.com/playlist?list=…"></textarea>
   </div>
 </div>
 
+<!-- ============ PRO-PANEL (nur wenn Pro aktiv) ============ -->
+<div class="admin" id="propanel" role="dialog" aria-modal="true" aria-label="Pro · Einstellungen">
+  <div class="admin__panel pro__panel">
+    <div class="admin__top">
+      <h2>PRO <b>·</b> EINSTELLUNGEN</h2>
+      <button class="admin__close" id="close-panel">Schliessen [ESC]</button>
+    </div>
+
+    <div class="admin__sub">Akzentfarbe</div>
+    <div class="thmrow" id="panel-themes"></div>
+    <div class="note">Dein Theme wird auf diesem Gerät gespeichert.</div>
+
+    <div class="admin__sub">Sleep-Timer</div>
+    <div class="sleeprow" id="panel-sleep">
+      <button class="sleepb" data-sleep="0">Aus</button>
+      <button class="sleepb" data-sleep="15">15 Min</button>
+      <button class="sleepb" data-sleep="30">30 Min</button>
+      <button class="sleepb" data-sleep="45">45 Min</button>
+      <button class="sleepb" data-sleep="60">60 Min</button>
+    </div>
+    <div class="note">Status: <b id="sleep-stat">aus</b> · blendet am Ende sanft aus und pausiert.</div>
+
+    <div class="admin__sub">Favoriten</div>
+    <div class="btnrow" style="margin-bottom:10px">
+      <button class="btn btn--accent" id="play-favs">Favoriten abspielen</button>
+      <span class="note" id="fav-stat" style="margin-top:0"></span>
+    </div>
+    <div class="favbox" id="fav-list"></div>
+  </div>
+</div>
+
 <script>
 /* ====================================================================
    TEMPLE — vanilla app
@@ -649,9 +698,79 @@ function applyProState(){
   const on = isPro();
   document.body.classList.toggle("is-pro", on);
   const act = document.getElementById("pro-active"); if (act) act.style.display = on ? "block" : "none";
+  applyTheme();
 }
-function openPro(){ document.getElementById("pro").classList.add("open"); const k=document.getElementById("pro-key"); if(k) setTimeout(()=>k.focus(),40); }
+// Trigger (Top-Button/Footer): Pro -> Steuer-Panel, sonst -> Kauf-Modal
+function openPro(){ if (isPro()) openPanel(); else openBuy(); }
+function openBuy(){ document.getElementById("pro").classList.add("open"); const k=document.getElementById("pro-key"); if(k) setTimeout(()=>k.focus(),40); }
 function closePro(){ document.getElementById("pro").classList.remove("open"); }
+
+/* ---------- PRO-FEATURE: Theme / Akzentfarbe ---------- */
+const THEMES = [
+  ["Säuregrün","#c6ff00","#000"], ["Blutrot","#ff2b1d","#fff"], ["Amber","#ffb000","#000"],
+  ["Cyan","#00e5ff","#000"], ["Magenta","#ff2bd0","#000"], ["Weiss","#ffffff","#000"],
+];
+function curTheme(){ try{ return JSON.parse(localStorage.getItem("temple_theme")||"null"); }catch(_){ return null; } }
+function applyTheme(){
+  const t = (isPro() && curTheme()) || THEMES[0];   // nur Pro behält ein Custom-Theme
+  document.documentElement.style.setProperty("--accent", t[1]);
+  document.documentElement.style.setProperty("--accent-ink", t[2]);
+}
+function setTheme(i){
+  if (!isPro()){ openBuy(); return; }
+  try{ localStorage.setItem("temple_theme", JSON.stringify(THEMES[i]||THEMES[0])); }catch(_){}
+  applyTheme(); renderPanel();
+}
+
+/* ---------- PRO-FEATURE: Sleep-Timer ---------- */
+let sleepTimer=null, sleepEnd=0, sleepMin=0, sleeping=false;
+function setSleep(min){
+  if (!isPro()){ openBuy(); return; }
+  clearTimeout(sleepTimer); sleepTimer=null; sleepEnd=0; sleepMin=min;
+  if (min>0){ sleepEnd = Date.now()+min*60000; sleepTimer=setTimeout(sleepFire, min*60000); }
+  renderPanel();
+}
+function sleepFire(){
+  sleeping=true;   // sanft ~8s ausblenden, dann pausieren (Ticker-Fade unterdrückt)
+  let step=0; const steps=40;
+  const iv=setInterval(()=>{
+    step++; fadeMul=Math.max(0,1-step/steps); applyVolume();
+    if (step>=steps){ clearInterval(iv); if(isPlaying) togglePlay(); fadeMul=1; sleeping=false; sleepEnd=0; sleepMin=0; sleepTimer=null; applyVolume(); renderPanel(); }
+  },200);
+}
+function sleepLeft(){ return sleepEnd ? Math.max(0, Math.round((sleepEnd-Date.now())/60000)) : 0; }
+
+/* ---------- PRO-Panel ---------- */
+function openPanel(){ document.getElementById("propanel").classList.add("open"); renderPanel(); }
+function closePanel(){ document.getElementById("propanel").classList.remove("open"); }
+function renderPanel(){
+  const cur = (isPro() && curTheme()) || THEMES[0];
+  const th = document.getElementById("panel-themes");
+  if (th) th.innerHTML = THEMES.map((t,i)=>`<button class="thm${t[0]===cur[0]?' on':''}" data-thm="${i}" title="${esc(t[0])}" aria-label="${esc(t[0])}" style="background:${t[1]}"></button>`).join("");
+  document.querySelectorAll("#panel-sleep [data-sleep]").forEach(b=> b.classList.toggle("on", +b.dataset.sleep === sleepMin));
+  const st = document.getElementById("sleep-stat");
+  if (st){ const l=sleepLeft(); st.textContent = sleepMin ? ("läuft — noch ~"+l+" Min") : "aus"; }
+  const favs = favTracks();
+  const fs = document.getElementById("fav-stat"); if (fs) fs.textContent = favs.length ? (favs.length + " gespeichert") : "noch leer";
+  const fl = document.getElementById("fav-list");
+  if (fl) fl.innerHTML = favs.length ? favs.slice(0,80).map(t=>{ const u=uid(t); return `<div class="favitem"><div><div class="favitem__title">${esc(t.title||t.id)}</div><div class="favitem__sub">${esc(t.artist||"—")}</div></div><button class="favitem__x" data-unfav="${esc(u)}" title="Entfernen">×</button></div>`; }).join("") : '<div class="empty" style="padding:16px 0">// keine Favoriten</div>';
+}
+
+/* ---------- PRO-FEATURE: Favoriten ---------- */
+function favSet(){ try{ return new Set(JSON.parse(localStorage.getItem("temple_favs")||"[]")); }catch(_){ return new Set(); } }
+function isFav(u){ return favSet().has(u); }
+function toggleFav(u){
+  if (!isPro()){ openBuy(); return; }
+  const s = favSet(); if (s.has(u)) s.delete(u); else s.add(u);
+  try{ localStorage.setItem("temple_favs", JSON.stringify([...s])); }catch(_){}
+  render();   // Herzen + Favoriten-Sektion aktualisieren
+}
+function favTracks(){
+  const s = favSet(); if (!s.size) return [];
+  const out=[];
+  LIB.genres.forEach(g=> g.tracks.forEach(t=>{ if (s.has(uid(t))) out.push(t); }));
+  return out;
+}
 async function redeemLicense(){
   const inp = document.getElementById("pro-key");
   const key = (inp.value||"").trim();
@@ -1122,7 +1241,7 @@ async function fetchMeta(url){
    STATE
    ==================================================================== */
 const LS_KEY = "temple_library_v1";
-const SEED_GENRES = ["Goa / Psytrance", "Hi-Tech", "Progressive Psy", "Forest / Darkpsy", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Drum & Bass", "Liquid DnB", "Neurofunk", "Jump Up", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
+const SEED_GENRES = ["Goa / Psytrance", "Full On Morning Psytrance", "Hi-Tech", "Progressive Psy", "Forest / Darkpsy", "Psybient / Psychill", "Ambient / IDM", "Healing / Meditation", "Downtempo / Trip-Hop", "Chill / Lounge", "Techno / House", "Drum & Bass", "Liquid DnB", "Neurofunk", "Jump Up", "Freetekno / Tekno", "Hardcore / Gabber", "Roots Reggae", "Reggae / Dub", "Stoner / Doom", "Psychedelic Rock", "Indie / Dream-Pop", "Akustik / Folk", "Rock / Classic", "Punk", "Pop / Synthwave", "Hip-Hop", "Folktronica / Shamanic", "Organic / Ethno", "Mittelalter / Neofolk", "Satire / Liedermacher", "Volksmusik / Schlager", "Game / OST", "Unsortiert"];
 
 let LIB = { version:1, updated:null, genres:[] };  // working copy
 let _dataLoaded = false;   // sind die Per-Genre-Track-Daten schon da?
@@ -1205,6 +1324,7 @@ function rowsHTML(matches){
       <svg class="row__eq eq" viewBox="0 0 14 14" aria-hidden="true"><rect x="1" y="3" width="3" height="11"/><rect x="5.5" y="3" width="3" height="11"/><rect x="10" y="3" width="3" height="11"/></svg>
       <div class="row__main"><div class="row__title">${esc(t.title||t.id)}</div><div class="row__artist">${esc(t.artist||"—")}</div></div>
       <span class="row__tag">${(t.kind==='playlist')?'PLAYLIST':''}</span>
+      <button class="row__fav${isFav(u)?' on':''}" data-fav="${esc(u)}" aria-label="Favorit" title="Favorit">♥</button>
     </div>`;
   }).join("");
 }
@@ -1473,7 +1593,8 @@ function updateTime(c,d){
   $("#player").style.setProperty("--prog", (p*100)+"%");   // Mobile-Fortschrittslinie
   const si = $("#seek-input"); if (document.activeElement !== si) si.value = Math.round(p*1000);
   // weiche Übergänge: fadeMul aus Position (rein über erste FADE s, raus über letzte FADE s); Mitte = 1 (selbstkorrigierend)
-  if (fadeOn && d > 2*FADE){
+  if (sleeping){ /* Sleep-Timer blendet gerade aus -> Auto-Fade nicht reinfunken */ }
+  else if (fadeOn && d > 2*FADE){
     const fm = Math.max(0, Math.min(1, Math.min(c/FADE, (d-c)/FADE)));
     if (Math.abs(fm - fadeMul) > 0.02){ fadeMul = fm; applyVolume(); }
   } else if (d > 0 && fadeMul !== 1){ fadeMul = 1; applyVolume(); }
@@ -1693,6 +1814,8 @@ function bind(){
 
   // delegated: row = play, section head = auf-/zuklappen
   $("#index").addEventListener("click", e=>{
+    const fav = e.target.closest("[data-fav]");
+    if (fav){ e.preventDefault(); e.stopPropagation(); toggleFav(fav.dataset.fav); return; }
     const row = e.target.closest(".row");
     if (row){ playUid(row.dataset.uid); return; }
     const head = e.target.closest(".section__head");
@@ -1700,6 +1823,8 @@ function bind(){
   });
   $("#index").addEventListener("keydown", e=>{
     if (e.key!=="Enter" && e.key!==" ") return;
+    const fav = e.target.closest("[data-fav]");
+    if (fav){ e.preventDefault(); toggleFav(fav.dataset.fav); return; }
     const row = e.target.closest(".row");
     if (row){ e.preventDefault(); playUid(row.dataset.uid); return; }
     const head = e.target.closest(".section__head");
@@ -1766,6 +1891,23 @@ function bind(){
   const buy=$("#pro-buy"), pp=$("#pro-paypal");
   if (PRO.buyUrl) buy.href=PRO.buyUrl; else buy.style.display="none";
   if (PRO.paypalUrl) pp.href=PRO.paypalUrl; else pp.style.display="none";
+
+  // pro-panel (Theme + Sleep)
+  $("#close-panel").onclick = closePanel;
+  $("#propanel").addEventListener("mousedown", e=>{ if(e.target===$("#propanel")) closePanel(); });
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("#propanel").classList.contains("open")) closePanel(); });
+  $("#propanel").addEventListener("click", e=>{
+    const x = e.target.closest("[data-unfav]");
+    if (x){ toggleFav(x.dataset.unfav); renderPanel(); return; }
+  });
+  $("#play-favs").onclick = ()=>{
+    const favs = favTracks(); if (!favs.length) return;
+    const favIds = new Set(favs.map(uid));
+    FLAT = []; LIB.genres.forEach(g=>g.tracks.forEach(t=>{ if (favIds.has(uid(t))) FLAT.push({t,genre:"Favoriten"}); }));
+    closePanel(); startPlay(FLAT[0], true);
+  };
+  $("#panel-themes").addEventListener("click", e=>{ const b=e.target.closest("[data-thm]"); if(b) setTheme(+b.dataset.thm); });
+  $("#panel-sleep").addEventListener("click", e=>{ const b=e.target.closest("[data-sleep]"); if(b) setSleep(+b.dataset.sleep); });
 }
 function routeHash(){ if (location.hash==="#"+ADMIN_KEY) openAdmin(); }
 

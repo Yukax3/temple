@@ -99,7 +99,7 @@ MAP=[
 ]
 
 vids=json.load(open("tools/tracks_yt.json"))
-GENRE_ORDER=["Goa / Psytrance","Hi-Tech","Progressive Psy","Forest / Darkpsy","Psybient / Psychill","Ambient / IDM","Healing / Meditation","Downtempo / Trip-Hop","Chill / Lounge","Techno / House","Drum & Bass","Liquid DnB","Neurofunk","Jump Up","Freetekno / Tekno","Hardcore / Gabber","Roots Reggae","Reggae / Dub","Stoner / Doom","Psychedelic Rock","Indie / Dream-Pop","Akustik / Folk","Rock / Classic","Punk","Pop / Synthwave","Hip-Hop","Folktronica / Shamanic","Organic / Ethno","Mittelalter / Neofolk","Satire / Liedermacher","Volksmusik / Schlager","Game / OST","Unsortiert"]
+GENRE_ORDER=["Goa / Psytrance","Full On Morning Psytrance","Hi-Tech","Progressive Psy","Forest / Darkpsy","Psybient / Psychill","Ambient / IDM","Healing / Meditation","Downtempo / Trip-Hop","Chill / Lounge","Techno / House","Drum & Bass","Liquid DnB","Neurofunk","Jump Up","Freetekno / Tekno","Hardcore / Gabber","Roots Reggae","Reggae / Dub","Stoner / Doom","Psychedelic Rock","Indie / Dream-Pop","Akustik / Folk","Rock / Classic","Punk","Pop / Synthwave","Hip-Hop","Folktronica / Shamanic","Organic / Ethno","Mittelalter / Neofolk","Satire / Liedermacher","Volksmusik / Schlager","Game / OST","Unsortiert"]
 def classify(t,a):
     h=norm(t+" "+a)
     htok=" "+re.sub(r"[^a-z0-9]+"," ",h).strip()+" "
