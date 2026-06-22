@@ -710,8 +710,8 @@ const GENRE_RULES = [
   ["hermanos gutiérrez","Akustik / Folk"], ["estas tonne","Akustik / Folk"], ["estás tonné","Akustik / Folk"],
   ["jose gonzalez","Akustik / Folk"], ["josé gonzález","Akustik / Folk"], ["ben howard","Akustik / Folk"],
   ["keaton henson","Akustik / Folk"], ["gnarls barkley","Indie / Dream-Pop"],
-  ["adam vandal","Freetekno / Tekno"], ["adam vandal","Freetekno / Tekno"], ["grasgeflüster","Reggae / Dub"],
-  ["grasgefluster","Reggae / Dub"], ["trip hazard","Psychedelic Rock"], ["game of thrones","Game / OST"],
+  ["adam vandal","Freetekno / Tekno"], ["grasgeflüster","Reggae / Dub"], ["grasgefluster","Reggae / Dub"],
+  ["trip hazard","Psychedelic Rock"], ["game of thrones","Game / OST"],
   ["psychedelic rock","Psychedelic Rock"], ["psych rock","Psychedelic Rock"],
   ["space rock","Psychedelic Rock"], ["dungeon synth","Mittelalter / Neofolk"],
   ["psychedelic kung fu","Psychedelic Rock"], ["psychill","Psybient / Psychill"],
@@ -1152,7 +1152,7 @@ function genreNames(){ return LIB.genres.map(g=>g.name); }
 /* ---------- load ---------- */
 async function loadLibrary(){
   let man = null;
-  try{ const r = await fetch("playlists.json", {cache:"no-store"}); if (r.ok) man = await r.json(); }catch(e){}
+  try{ const r = await fetch("playlists.json", {cache:"no-cache"}); if (r.ok) man = await r.json(); }catch(e){}
   let local = null;
   try{ local = JSON.parse(localStorage.getItem(LS_KEY)||"null"); }catch(e){}
   // Admin-Stand (lokal, voll) hat Vorrang
@@ -1171,7 +1171,7 @@ async function loadLibrary(){
 async function loadAllData(){
   await Promise.all(LIB.genres.map(async g=>{
     if (g.tracks.length) return;
-    try{ const r = await fetch("data/"+slug(g.name)+".json", {cache:"no-store"}); if (r.ok){ const d = await r.json(); g.tracks = (d && d.tracks) || []; } }catch(e){}
+    try{ const r = await fetch("data/"+slug(g.name)+".json", {cache:"no-cache"}); if (r.ok){ const d = await r.json(); g.tracks = (d && d.tracks) || []; } }catch(e){}
   }));
   _dataLoaded = true; render();
 }
@@ -1183,15 +1183,18 @@ function saveLocal(){
 /* ====================================================================
    RENDER — the temple index
    ==================================================================== */
-function matchTrack(t, g, q){
-  if (!q) return true;
-  const hay = norm(t.title) + " " + norm(t.artist) + " " + norm(g);
-  return q.split(/\s+/).every(w => !w || hay.includes(w));   // Mehrwort: alle Begriffe müssen vorkommen
+function qterms(q){ q = (q!==undefined) ? q : norm($("#search").value); return q ? q.split(/\s+/).filter(Boolean) : []; }
+function matchTrack(t, g, terms){
+  if (!terms || !terms.length) return true;
+  // PERF: normalisierten Such-String pro Track EINMAL berechnen + cachen (statt norm() bei jedem Tastendruck)
+  let s = t._s; if (s === undefined) s = t._s = norm((t.title||"") + " " + (t.artist||"") + " " + g);
+  for (let i=0;i<terms.length;i++){ if (s.indexOf(terms[i]) === -1) return false; }  // Mehrwort: alle Begriffe (UND)
+  return true;
 }
-function buildFlat(q){   // Queue (next/prev/random) — unabhängig vom DOM
-  q = (q!==undefined) ? q : norm($("#search").value);
+function buildFlat(terms){   // Queue (next/prev/random) — unabhängig vom DOM
+  if (terms === undefined) terms = qterms();
   FLAT = [];
-  LIB.genres.forEach(g=> g.tracks.forEach(t=>{ if (matchTrack(t,g.name,q)) FLAT.push({t, genre:g.name}); }));
+  LIB.genres.forEach(g=> g.tracks.forEach(t=>{ if (matchTrack(t,g.name,terms)) FLAT.push({t, genre:g.name}); }));
 }
 function rowsHTML(matches){
   if (!matches.length) return `<div class="empty">// LEER — <b>im Hub befüllen</b></div>`;
@@ -1207,13 +1210,14 @@ function rowsHTML(matches){
 }
 function render(){
   const q = norm($("#search").value);
+  const terms = q ? q.split(/\s+/).filter(Boolean) : [];
   const idx = $("#index"); const gnav = $("#gnav");
   idx.innerHTML = ""; gnav.innerHTML = "";
-  buildFlat(q);
+  buildFlat(terms);
   let total = 0, shownGenres = 0;
   LIB.genres.forEach(g=>{
     const cnt = g.tracks.length || g.count || 0;     // Manifest-Anzahl bis Daten geladen
-    const matches = g.tracks.filter(t=>matchTrack(t,g.name,q));
+    const matches = g.tracks.filter(t=>matchTrack(t,g.name,terms));
     total += cnt;
     if (q && matches.length===0) return;   // beim Suchen leere Genres ausblenden
     shownGenres++;
@@ -1283,6 +1287,7 @@ function startPlay(e, noOpen){
   } else {
     render();   // Track liegt in geschlossener/anderer Sektion -> einmalig voll rendern (öffnet sie)
   }
+  setTimeout(prefetchNext, 1200);   // BUFFER: nächsten Track vorwärmen (auch wenn gerade YT läuft); konkurriert nicht mit dem Start
 }
 
 // YouTube: Player wird LAZY mit konkreter ID erzeugt (sonst kein iframe)
@@ -1320,6 +1325,28 @@ function playSC(e){
   else playSCWidget(e);
 }
 
+// Stream-URL auflösen + im Speicher cachen (für sofortigen Track-Wechsel / Prefetch)
+const streamCache = new Map();   // sc-id -> { url, ts }
+const STREAM_TTL = 5*60*1000;    // cf-media-URLs sind ~Minuten gültig
+async function resolveStream(id){
+  const c = streamCache.get(id);
+  if (c && Date.now()-c.ts < STREAM_TTL) return c.url;
+  const r = await fetch("/api/stream?id=" + encodeURIComponent(id));
+  const j = await r.json().catch(()=>({}));
+  if (!r.ok || !j.url) throw new Error(j.error || ("HTTP " + r.status));
+  streamCache.set(id, { url:j.url, ts:Date.now() });
+  return j.url;
+}
+// Nächsten Track vorab auflösen -> Wechsel ist sofort (kein /api/stream-Warten)
+function prefetchNext(){
+  if (shuffle || repeat || !FLAT.length) return;   // bei Zufall/Repeat ist „nächster" nicht vorhersagbar
+  const i = curIndex(); if (i < 0) return;
+  const nx = FLAT[(i+1) % FLAT.length];
+  if (nx && nx.t.source === "soundcloud" && /^\d+$/.test(String(nx.t.id))){
+    resolveStream(nx.t.id).catch(()=>{});   // nur vorwärmen
+  }
+}
+
 // NATIV: direkte Stream-URL via /api/stream -> <audio>. Läuft im iOS-Hintergrund/Lock-Screen.
 async function playSCNative(e){
   curScMode = "native";
@@ -1330,20 +1357,19 @@ async function playSCNative(e){
   try{ scAudio.src = SC_SILENT; scAudio.play().catch(()=>{}); }catch(_){}
   scReady = false;
   const myId = uid(e.t);
-  let j;
+  let url;
   try{
-    const r = await fetch("/api/stream?id=" + encodeURIComponent(e.t.id));
-    j = await r.json().catch(()=>({}));
-    if (!r.ok || !j.url) throw new Error(j.error || ("HTTP " + r.status));
+    url = await resolveStream(e.t.id);   // gecacht (Prefetch) -> oft sofort da
   }catch(err){
     console.warn("SC nativ fehlgeschlagen -> Widget-Fallback:", err && err.message);
     if (curId === myId) playSCWidget(e);   // dieser Track nicht streambar (Go+?) -> Widget
     return;
   }
   if (curId !== myId) return;   // Nutzer hat inzwischen umgeschaltet
-  scAudio.src = j.url;
+  scAudio.preload = "auto";    // BUFFER: laufenden Track aggressiv vorladen
+  scAudio.src = url;
   applyVolume();
-  scAudio.play().then(()=>{ scReady = true; isPlaying = true; reflectPlay(); startTicker(); }).catch(()=>{});
+  scAudio.play().then(()=>{ scReady = true; isPlaying = true; reflectPlay(); startTicker(); prefetchNext(); }).catch(()=>{});
 }
 
 // WIDGET (Fallback / ?widget): altes iframe-Verhalten
@@ -1395,14 +1421,20 @@ function togglePlay(){
   if (st === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
 }
 function curIndex(){ return FLAT.findIndex(e=>uid(e.t)===curId); }
+let shufHist = [];   // zuletzt gespielte uids (Shuffle ohne kurzfristige Wiederholungen)
 function next(){
   if (!FLAT.length) return;
   if (repeat && curId){ playUid(curId); return; }
   let i = curIndex();
   if (shuffle){
-    if (FLAT.length>1){ do { i = Math.floor(Math.random()*FLAT.length); } while (uid(FLAT[i].t)===curId); }  // nicht denselben Track doppeln
-    else i = 0;
+    if (FLAT.length>1){
+      const recent = new Set(shufHist.slice(-Math.min(20, FLAT.length-1)));   // letzte ~20 meiden
+      let guard = 0;
+      do { i = Math.floor(Math.random()*FLAT.length); }
+      while ((uid(FLAT[i].t)===curId || recent.has(uid(FLAT[i].t))) && ++guard < 50);
+    } else i = 0;
   } else i = (i+1) % FLAT.length;
+  if (curId){ shufHist.push(curId); if (shufHist.length>40) shufHist.shift(); }
   playUid(uid(FLAT[i].t));
 }
 function prev(){
@@ -1642,10 +1674,10 @@ function toggleGenre(name, head){
   if (!tracks) return;
   if (open){
     const g = LIB.genres.find(x=>x.name===name);
-    const fill = ()=>{ const q=norm($("#search").value); tracks.innerHTML = rowsHTML((g?g.tracks:[]).filter(t=>matchTrack(t,name,q))); };
+    const fill = ()=>{ const terms=qterms(); tracks.innerHTML = rowsHTML((g?g.tracks:[]).filter(t=>matchTrack(t,name,terms))); };
     if (g && !g.tracks.length && !_dataLoaded){           // Daten noch nicht da -> jetzt holen
       tracks.innerHTML = '<div class="empty">// lädt…</div>';
-      fetch("data/"+slug(name)+".json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{ if(d&&d.tracks) g.tracks=d.tracks; fill(); }).catch(fill);
+      fetch("data/"+slug(name)+".json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).then(d=>{ if(d&&d.tracks) g.tracks=d.tracks; fill(); }).catch(fill);
     } else {
       fill();
     }

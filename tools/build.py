@@ -19,7 +19,7 @@ MAP=[
 ("macky gee","Jump Up"),("skepsis","Jump Up"),("kanine","Jump Up"),("hedex","Jump Up"),("dj hazard","Jump Up"),("original sin","Jump Up"),("benny l","Jump Up"),("sub zero","Jump Up"),("dutta","Jump Up"),("jump up","Jump Up"),
 ("windhand","Stoner / Doom"),("meiko","Chill / Lounge"),("leave the lights on","Chill / Lounge"),("omer balik","Chill / Lounge"),("omer balık","Chill / Lounge"),("coffee blues","Chill / Lounge"),("bon iver","Chill / Lounge"),
 ("daniel norgren","Akustik / Folk"),("hermanos gutierrez","Akustik / Folk"),("hermanos gutiérrez","Akustik / Folk"),("estas tonne","Akustik / Folk"),("estás tonné","Akustik / Folk"),("jose gonzalez","Akustik / Folk"),("josé gonzález","Akustik / Folk"),("ben howard","Akustik / Folk"),("keaton henson","Akustik / Folk"),
-("gnarls barkley","Indie / Dream-Pop"),("adam vandal","Freetekno / Tekno"),("hot","Freetekno / Tekno") if False else ("adam vandal","Freetekno / Tekno"),
+("gnarls barkley","Indie / Dream-Pop"),("adam vandal","Freetekno / Tekno"),
 ("grasgeflüster","Reggae / Dub"),("grasgefluster","Reggae / Dub"),
 ("trip hazard","Psychedelic Rock"),("game of thrones","Game / OST"),
 # --- Override-Phrasen zuerst ---
