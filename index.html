@@ -383,8 +383,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   color:var(--accent);border:1px solid var(--accent);padding:8px 14px;white-space:nowrap;transition:.12s;
 }
 .top__support:hover{background:var(--accent);color:var(--accent-ink)}
-.is-pro .top__support{color:var(--fg);border-color:var(--line-2)}
-.is-pro .top__support::before{content:"✓ "}
+.is-pro .top__support{color:var(--accent);border-color:var(--accent)}
 /* Pro-Panel: Theme-Swatches + Sleep */
 .thmrow{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
 .thm{width:34px;height:34px;border:2px solid var(--line-2);cursor:pointer;transition:.12s}
@@ -642,7 +641,18 @@ https://www.youtube.com/playlist?list=…"></textarea>
 
     <div class="admin__sub">Akzentfarbe</div>
     <div class="thmrow" id="panel-themes"></div>
+    <div class="btnrow" style="margin-top:4px"><label class="note" for="panel-accent" style="margin-top:0">Eigene Farbe:</label><input type="color" id="panel-accent" value="#c6ff00" aria-label="Eigene Akzentfarbe"></div>
     <div class="note">Dein Theme wird auf diesem Gerät gespeichert.</div>
+
+    <div class="admin__sub">Tempo</div>
+    <div class="sleeprow" id="panel-speed">
+      <button class="sleepb" data-speed="0.75">0.75×</button>
+      <button class="sleepb" data-speed="1">1×</button>
+      <button class="sleepb" data-speed="1.25">1.25×</button>
+      <button class="sleepb" data-speed="1.5">1.5×</button>
+      <button class="sleepb" data-speed="2">2×</button>
+    </div>
+    <div class="note">Tonhöhe bleibt erhalten. Gilt für YouTube &amp; SoundCloud.</div>
 
     <div class="admin__sub">Sleep-Timer</div>
     <div class="sleeprow" id="panel-sleep">
@@ -675,6 +685,9 @@ https://www.youtube.com/playlist?list=…"></textarea>
       <span class="note" id="history-stat" style="margin-top:0"></span>
     </div>
     <div class="favbox" id="history-list"></div>
+
+    <div class="admin__sub">Tastatur</div>
+    <div class="note"><b>Leertaste</b> Play/Pause · <b>←/→</b> Zurück/Weiter · <b>↑/↓</b> Lautstärke · <b>M</b> Stumm · <b>S</b> Shuffle · <b>F</b> Favorit</div>
   </div>
 </div>
 
@@ -716,6 +729,8 @@ function applyProState(){
   const on = isPro();
   document.body.classList.toggle("is-pro", on);
   const act = document.getElementById("pro-active"); if (act) act.style.display = on ? "block" : "none";
+  const top = document.getElementById("open-pro-top"); if (top) top.textContent = on ? "⚙ Pro" : "♥ Support";
+  const fl = document.getElementById("open-pro"); if (fl) fl.textContent = on ? "Pro · Einstellungen" : "Support · Pro";
   applyTheme();
 }
 // Trigger (Top-Button/Footer): Pro -> Steuer-Panel, sonst -> Kauf-Modal
@@ -768,6 +783,8 @@ function renderPanel(){
   document.querySelectorAll("#panel-sleep [data-sleep]").forEach(b=> b.classList.toggle("on", +b.dataset.sleep === sleepMin));
   const st = document.getElementById("sleep-stat");
   if (st){ const l=sleepLeft(); st.textContent = sleepMin ? ("läuft — noch ~"+l+" Min") : "aus"; }
+  document.querySelectorAll("#panel-speed [data-speed]").forEach(b=> b.classList.toggle("on", parseFloat(b.dataset.speed) === playbackSpeed));
+  const ac = document.getElementById("panel-accent"); if (ac) ac.value = cur[1];
   const renderMini = (items, action, empty)=> items.length ? items.slice(0,80).map(t=>{ const u=uid(t); return `<div class="favitem"><div><div class="favitem__title">${esc(t.title||t.id)}</div><div class="favitem__sub">${esc(t.artist||"—")}</div></div><button class="favitem__x" ${action}="${esc(u)}" title="Entfernen">×</button></div>`; }).join("") : `<div class="empty" style="padding:16px 0">// ${empty}</div>`;
   const favs = favTracks();
   const fs = document.getElementById("fav-stat"); if (fs) fs.textContent = favs.length ? (favs.length + " gespeichert") : "noch leer";
@@ -795,6 +812,49 @@ function favTracks(){
   LIB.genres.forEach(g=> g.tracks.forEach(t=>{ if (s.has(uid(t))) out.push(t); }));
   return out;
 }
+
+/* ---------- PRO-FEATURE: Playback-Speed ---------- */
+let playbackSpeed = 1;
+function loadSpeed(){ try{ playbackSpeed = parseFloat(localStorage.getItem("temple_speed"))||1; }catch(_){ playbackSpeed=1; } }
+function applySpeed(){
+  if (scAudio){ try{ scAudio.playbackRate = playbackSpeed; }catch(_){} }
+  if (player && player.setPlaybackRate){ try{ player.setPlaybackRate(playbackSpeed); }catch(_){} }
+}
+function setSpeed(r){
+  if (!isPro()){ openBuy(); return; }
+  playbackSpeed = r; try{ localStorage.setItem("temple_speed", String(r)); }catch(_){}
+  applySpeed(); renderPanel();
+}
+
+/* ---------- PRO-FEATURE: Freie Akzentfarbe ---------- */
+function pickInk(hex){
+  const c=(hex||"").replace("#",""); if(c.length<6) return "#000";
+  const r=parseInt(c.slice(0,2),16), g=parseInt(c.slice(2,4),16), b=parseInt(c.slice(4,6),16);
+  return (0.299*r+0.587*g+0.114*b)/255 > 0.6 ? "#000" : "#fff";   // heller Akzent -> dunkler Text
+}
+function setAccent(hex){
+  if (!isPro()){ openBuy(); return; }
+  try{ localStorage.setItem("temple_theme", JSON.stringify(["Custom", hex, pickInk(hex)])); }catch(_){}
+  applyTheme(); renderPanel();
+}
+
+/* ---------- PRO-FEATURE: Keyboard-Shortcuts ---------- */
+function onProKey(e){
+  if (!isPro()) return;
+  const t=(e.target.tagName||"").toLowerCase();
+  if (t==="input"||t==="textarea"||e.target.isContentEditable) return;
+  if (document.getElementById("admin").classList.contains("open")) return;
+  switch(e.key){
+    case " ": case "Spacebar": e.preventDefault(); togglePlay(); break;
+    case "ArrowRight": next(); break;
+    case "ArrowLeft": prev(); break;
+    case "ArrowUp": e.preventDefault(); muted=false; volume=Math.min(100,volume+5); applyVolume(); break;
+    case "ArrowDown": e.preventDefault(); volume=Math.max(0,volume-5); muted=(volume===0); applyVolume(); break;
+    case "m": case "M": muted=!muted; if(!muted&&volume===0) volume=60; applyVolume(); break;
+    case "s": case "S": shuffle=!shuffle; { const b=$("#btn-shuffle"); if(b) b.classList.toggle("is-on",shuffle); } break;
+    case "f": case "F": if(curId) toggleFav(curId); break;
+  }
+}
 function trackByUid(u){ let found=null; LIB.genres.some(g=>g.tracks.some(t=>{ if(uid(t)===u){ found=t; return true; } return false; })); return found; }
 function idsLS(k){ try{ return JSON.parse(localStorage.getItem(k)||"[]").filter(Boolean); }catch(_){ return []; } }
 function setIdsLS(k, ids){ try{ localStorage.setItem(k, JSON.stringify(ids)); }catch(_){} }
@@ -820,7 +880,10 @@ async function redeemLicense(){
   try{
     const r = await fetch("/api/license", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ key }) });
     const j = await r.json().catch(()=>({}));
-    if (r.ok && j.ok){ setPro(key); setStat("#pro-stat","✓ Freigeschaltet — danke!","ok"); }
+    if (r.ok && j.ok){
+      setPro(key); setStat("#pro-stat","✓ Freigeschaltet — danke!","ok");
+      setTimeout(()=>{ closePro(); openPanel(); }, 700);   // direkt ins Einstellungs-Panel
+    }
     else setStat("#pro-stat","✗ "+(j.error || ("ungültig (HTTP "+r.status+")")),"err");
   }catch(e){ setStat("#pro-stat","✗ Netzwerkfehler: "+(e&&e.message||e),"err"); }
 }
@@ -1665,6 +1728,7 @@ function updateTime(c,d){
 }
 function startTicker(){
   clearInterval(ticker);
+  applySpeed();   // Pro: Playback-Tempo auf den (neuen) Track anwenden
   ticker = setInterval(()=>{
     if (curSource === "soundcloud"){
       if (curScMode === "native"){
@@ -1986,6 +2050,9 @@ function bind(){
   $("#clear-history").onclick = ()=>{ setIdsLS("temple_history", []); renderPanel(); };
   $("#panel-themes").addEventListener("click", e=>{ const b=e.target.closest("[data-thm]"); if(b) setTheme(+b.dataset.thm); });
   $("#panel-sleep").addEventListener("click", e=>{ const b=e.target.closest("[data-sleep]"); if(b) setSleep(+b.dataset.sleep); });
+  $("#panel-speed").addEventListener("click", e=>{ const b=e.target.closest("[data-speed]"); if(b) setSpeed(parseFloat(b.dataset.speed)); });
+  $("#panel-accent").addEventListener("input", e=> setAccent(e.target.value));
+  document.addEventListener("keydown", onProKey);
 }
 function routeHash(){ if (location.hash==="#"+ADMIN_KEY) openAdmin(); }
 
@@ -1994,6 +2061,7 @@ async function boot(){
   $("#year").textContent = new Date().getFullYear();
   buildViz();
   await loadLibrary();
+  loadSpeed();
   bind();
   applyProState();
   render();
