@@ -1,6 +1,15 @@
 // Vercel Serverless Function — POST /api/publish
-// Schreibt playlists.json über die GitHub Contents API ins Repo.
+// Schreibt die TEMPLE-Bibliothek über die GitHub Contents API ins Repo.
 // Vercel deployt auf den Push automatisch neu → Änderung ist live.
+//
+// UNTERSTÜTZT ZWEI MODI (über body.mode):
+//   mode:"split"  (empfohlen) — schreibt das winzige Manifest (playlists.json)
+//                               + JEDE Genre-Datei in data/<slug>.json. So bleibt
+//                               der Initial-Load schnell (lazy/progressiv). Das ist
+//                               das Format, das tools/build.py erzeugt.
+//   mode:"full"   (Legacy)    — schreibt EINE playlists.json mit allen Tracks inline.
+//                               Nur für Notfälle / alte Setups. Bricht den Split-Vorteil.
+//   Default (kein mode)       — "split" (das aktuelle Architektur-Ziel).
 //
 // HÄRTUNG (öffentliche Seite):
 //   - timing-sichere Passwortprüfung (kein Timing-Leak)
@@ -53,6 +62,46 @@ function safeEqual(a, b) {
   return crypto.timingSafeEqual(ab, bb);
 }
 
+// Slug wie im Frontend/Build: normalisieren, Nicht-Alphanumerisches zu "-"
+function slug(s) {
+  return (s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "x";
+}
+
+// Eine Datei via Contents API schreiben (PUT). Holt vorherigen SHA für Update.
+async function putFile(api, gh, branch, path, content, msg) {
+  const url = `https://api.github.com/repos/${api.owner}/${api.repo}/contents/${encodeURIComponent(path)}`;
+  let sha;
+  const cur = await fetch(`${url}?ref=${encodeURIComponent(branch)}`, { headers: gh });
+  if (cur.status === 200) {
+    const j = await cur.json();
+    sha = j.sha;
+  } else if (cur.status !== 404) {
+    const t = await cur.text();
+    throw new Error(`GET ${path} fehlgeschlagen: ${t.slice(0, 200)}`);
+  }
+  const put = await fetch(url, {
+    method: "PUT",
+    headers: { ...gh, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: msg,
+      content: Buffer.from(content, "utf8").toString("base64"),
+      branch,
+      ...(sha ? { sha } : {}),
+    }),
+  });
+  if (!put.ok) {
+    const t = await put.text();
+    throw new Error(`PUT ${path} fehlgeschlagen: ${t.slice(0, 200)}`);
+  }
+  const out = await put.json();
+  return out.commit ? out.commit.sha : null;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -79,7 +128,8 @@ export default async function handler(req, res) {
     try { body = JSON.parse(body); } catch { body = {}; }
   }
   body = body || {};
-  const { password, playlists } = body;
+  const { password, playlists, mode } = body;
+  const useSplit = mode !== "full";   // Default: split (aktuelle Architektur)
 
   // 2) Auth — timing-sicher, mit Verzögerung bei Fehlschlag
   if (!password || !safeEqual(password, ADMIN)) {
@@ -96,12 +146,11 @@ export default async function handler(req, res) {
   const owner  = process.env.GITHUB_OWNER;
   const repo   = process.env.GITHUB_REPO;
   const branch = process.env.GITHUB_BRANCH || "main";
-  const path   = process.env.GITHUB_PATH || "playlists.json";
   if (!token || !owner || !repo) {
     return res.status(500).json({ error: "GitHub-Env-Vars fehlen (GITHUB_TOKEN/OWNER/REPO)" });
   }
 
-  const api = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+  const api = { owner, repo };
   const gh = {
     "Authorization": `Bearer ${token}`,
     "Accept": "application/vnd.github+json",
@@ -110,37 +159,61 @@ export default async function handler(req, res) {
   };
 
   try {
-    // aktuellen SHA holen (für Update)
-    let sha;
-    const cur = await fetch(`${api}?ref=${encodeURIComponent(branch)}`, { headers: gh });
-    if (cur.status === 200) {
-      const j = await cur.json();
-      sha = j.sha;
-    } else if (cur.status !== 404) {
-      const t = await cur.text();
-      return res.status(502).json({ error: "GitHub GET fehlgeschlagen", detail: t.slice(0, 300) });
+    const total = playlists.genres.reduce((n, g) => n + (g.tracks ? g.tracks.length : (g.count || 0)), 0);
+    const ts = (playlists.updated || new Date().toISOString());
+
+    // ---------- SPLIT-MODUS: Manifest + data/*.json ----------
+    if (useSplit) {
+      let hsec = 0;
+      const files = [];   // [{ path, content, msg }]
+
+      // 1) Manifest (winzig): nur Name/Anzahl/Dauer
+      const man = { version: 2, manifest: true, updated: ts, genres: [], total: 0, hsec: 0 };
+      for (const g of playlists.genres) {
+        const tracks = g.tracks || [];
+        const durKnown = tracks.reduce((s, t) => s + (t.dur || 0), 0);
+        const durCount = tracks.filter((t) => t.dur).length;
+        const count = tracks.length || g.count || 0;
+        man.genres.push({ name: g.name, count, durKnown, durCount });
+        man.total += count;
+        man.hsec += durKnown + (count - durCount) * 300;
+        // Genre-Datei (nur wenn Tracks vorhanden — sonst leerlassen)
+        if (tracks.length) {
+          files.push({
+            path: `data/${slug(g.name)}.json`,
+            content: JSON.stringify({ name: g.name, tracks }, null, 1) + "\n",
+          });
+        }
+      }
+      files.unshift({
+        path: "playlists.json",
+        content: JSON.stringify(man, null, 1) + "\n",
+      });
+
+      // Sequentiell schreiben (GitHub-Rate-Limit schonend; eh nur wenige/Many kleine Files)
+      const commits = [];
+      let i = 0;
+      for (const f of files) {
+        i++;
+        const msg = `temple: ${f.path} (${i}/${files.length})`;
+        const c = await putFile(api, gh, branch, f.path, f.content, msg);
+        commits.push({ path: f.path, sha: c });
+      }
+      return res.status(200).json({
+        ok: true,
+        mode: "split",
+        files: commits.length,
+        total,
+        manifest: man.total,
+      });
     }
 
-    // neue Datei schreiben
+    // ---------- FULL-MODUS (Legacy): eine playlists.json ----------
     const content = JSON.stringify(playlists, null, 2) + "\n";
-    const put = await fetch(api, {
-      method: "PUT",
-      headers: { ...gh, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: `temple: update library (${(playlists.genres || []).reduce((n, g) => n + (g.tracks ? g.tracks.length : 0), 0)} tracks)`,
-        content: Buffer.from(content, "utf8").toString("base64"),
-        branch,
-        ...(sha ? { sha } : {}),
-      }),
-    });
-
-    if (!put.ok) {
-      const t = await put.text();
-      return res.status(502).json({ error: "GitHub PUT fehlgeschlagen", detail: t.slice(0, 300) });
-    }
-    const out = await put.json();
-    return res.status(200).json({ ok: true, commit: out.commit && out.commit.sha });
+    const path = process.env.GITHUB_PATH || "playlists.json";
+    const sha = await putFile(api, gh, branch, path, content, `temple: update library (${total} tracks, legacy full)`);
+    return res.status(200).json({ ok: true, mode: "full", commit: sha, total });
   } catch (e) {
-    return res.status(500).json({ error: "Serverfehler", detail: String(e).slice(0, 300) });
+    return res.status(502).json({ error: "Publish fehlgeschlagen", detail: String(e.message || e).slice(0, 300) });
   }
 }

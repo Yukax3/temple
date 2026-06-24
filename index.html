@@ -236,6 +236,9 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
   content:"// KEIN TRACK GEWÄHLT — WÄHLE OBEN AUS DEM INDEX";
   font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--muted-2);
 }
+body.lang-en .player.is-empty::after{content:"// NO TRACK SELECTED — PICK ONE FROM THE INDEX"}
+.btn-lang{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);border:1px solid var(--line-2);padding:8px 10px;white-space:nowrap;transition:.12s}
+.btn-lang:hover{color:var(--fg);border-color:var(--fg)}
 .pl__now{display:flex;align-items:center;gap:14px;min-width:0}
 .pl__badge{
   font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
@@ -492,9 +495,10 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
     <div class="brand">TEM<b>·</b>PLE</div>
     <div class="search" role="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input id="search" type="search" placeholder="suche / filter — titel, künstler, genre…" aria-label="Musik durchsuchen" autocomplete="off">
+      <input id="search" type="search" placeholder="suche / filter — titel, künstler, genre…" data-i18n-ph="search" aria-label="Musik durchsuchen" autocomplete="off">
     </div>
-    <button class="top__support" id="open-pro-top" type="button" aria-label="Support · Pro">♥ Support</button>
+    <button class="btn-lang" id="btn-lang" type="button" aria-label="Sprache umschalten / switch language" style="margin-left:auto">EN</button>
+    <button class="top__support" id="open-pro-top" type="button" aria-label="Support · Pro" style="margin-left:10px">♥ Support</button>
   </div>
 </header>
 
@@ -509,10 +513,10 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
       <span>Folktronica</span><span>Mittelalter</span><span>Game/OST</span><span>Satire</span>
     </div>
     <div class="hero__meta">
-      <span><b id="m-tracks">0</b> Tracks</span>
-      <span><b id="m-genres">0</b> Genres</span>
-      <span>≈ <b id="m-hours">0</b> Std</span>
-      <span>Audio-first · YT + SoundCloud</span>
+      <span><b id="m-tracks">0</b> <span data-i18n="tracks">Tracks</span></span>
+      <span><b id="m-genres">0</b> <span data-i18n="genres">Genres</span></span>
+      <span>≈ <b id="m-hours">0</b> <span data-i18n="hours">Std</span></span>
+      <span data-i18n="audiofirst">Audio-first · YT + SoundCloud</span>
     </div>
   </div>
 </section>
@@ -529,7 +533,7 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 <footer class="foot">
   <div class="wrap foot__row">
     <span>TEMPLE — UNDERGROUND ARCHIVE<span class="badge-pro" id="badge-pro">PRO</span></span>
-    <span><span class="foot__pro" id="open-pro" role="button" tabindex="0">Support · Pro</span> · NUR LINKS · NUR EMBEDS · <span id="year"></span></span>
+    <span><span class="foot__pro" id="open-pro" role="button" tabindex="0">Support · Pro</span> · <span data-i18n="onlylinks">NUR LINKS · NUR EMBEDS</span> · <span id="year"></span></span>
   </div>
 </footer>
 
@@ -605,6 +609,9 @@ button{font-family:inherit;color:inherit;background:none;border:none;cursor:poin
 <!-- Natives SC-Audio: spielt direkte Stream-URL (via /api/stream) -> läuft im iOS-Hintergrund/Lock-Screen weiter. src = stilles WAV für iOS-Geste-Unlock -->
 <audio id="scaudio" preload="none" playsinline src="data:audio/wav;base64,UklGRiwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQgAAACAgICAgICAgA=="></audio>
 <audio id="scpreload" preload="none" playsinline></audio>
+<!-- YT-Native: Audio-Stream via /api/ytaudio → <audio>. Für iOS-Hintergrund + Lock-Screen. -->
+<audio id="ytaudio" preload="none" playsinline></audio>
+<audio id="ytpreload" preload="none" playsinline></audio>
 
 <!-- ============ ADMIN HUB ============ -->
 <div class="admin" id="admin" role="dialog" aria-modal="true" aria-label="Admin Hub">
@@ -646,9 +653,9 @@ https://www.youtube.com/playlist?list=…"></textarea>
       <span class="stat" id="pub-stat"></span>
     </div>
     <div class="note">
-      <b>Publish</b> schreibt die komplette Bibliothek über die Serverless-Funktion in dein GitHub-Repo → Vercel deployt neu → für alle live.<br>
-      <b>Hinweis Sicherheit:</b> Dieses Panel ist nur clientseitig versteckt (kosmetisch). Der echte Schutz sitzt serverseitig — ohne korrektes Passwort wird nichts veröffentlicht.<br>
-      <b>Lokal / ohne Deploy:</b> „Export JSON" lädt die Datei herunter; du kannst sie auch von Hand in GitHub ersetzen.
+      <b>Publish (Split-Modus)</b> schreibt das kleine <b>Manifest</b> (<code>playlists.json</code>) + <b>jede Genre-Datei</b> in <code>data/</code> via GitHub → Vercel deployt neu → für alle live. Entspricht <code>tools/build.py</code>.<br>
+      <b>Hinweis:</b> Lade die ganze Bibliothek besser über <code>tools/add.py</code> + Git-Upload hoch (skaliert auf 10k+). Dieser Hub-Publish ist für schnelle Korrekturen am laufenden Betrieb.<br>
+      <b>Sicherheit:</b> Serverseitiges Passwort + Rate-Limit schützen den Endpunkt. Client-Versteck ist kosmetisch.
     </div>
 
     <!-- manage genres -->
@@ -805,6 +812,27 @@ const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const esc = s => (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "x";
 const fmt = t => { t=Math.max(0,Math.floor(t||0)); const m=Math.floor(t/60), s=t%60; return m+":"+String(s).padStart(2,"0"); };
+
+/* ---------- i18n: Deutsch / English ---------- */
+const I18N = {
+  search:    { de:"suche / filter — titel, künstler, genre…", en:"search / filter — title, artist, genre…" },
+  tracks:    { de:"Tracks", en:"Tracks" },
+  genres:    { de:"Genres", en:"Genres" },
+  hours:     { de:"Std", en:"hrs" },
+  audiofirst:{ de:"Audio-first · YT + SoundCloud", en:"Audio-first · YT + SoundCloud" },
+  onlylinks: { de:"NUR LINKS · NUR EMBEDS", en:"LINKS ONLY · EMBEDS ONLY" },
+};
+let LANG = (()=>{ try{ return localStorage.getItem("temple_lang")||"de"; }catch(_){ return "de"; } })();
+function t(k){ const e=I18N[k]; return e ? (e[LANG]||e.de) : k; }
+function applyLang(){
+  LANG = (LANG==="en") ? "en" : "de";
+  document.documentElement.lang = LANG;
+  document.body.classList.toggle("lang-en", LANG==="en");
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ const v=t(el.dataset.i18n); if(v) el.textContent=v; });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{ const v=t(el.dataset.i18nPh); if(v) el.setAttribute("placeholder",v); });
+  const lb=document.getElementById("btn-lang"); if(lb) lb.textContent = (LANG==="de") ? "EN" : "DE";
+}
+function toggleLang(){ LANG = (LANG==="de") ? "en" : "de"; try{ localStorage.setItem("temple_lang",LANG); }catch(_){} applyLang(); }
 
 /* ---------- PRO / SUPPORT ----------------------------------------
    Bezahl-Links hier eintragen, sobald das Lemon-Squeezy-Produkt + PayPal stehen.
@@ -1481,6 +1509,13 @@ let curScMode = null;   // "native" | "widget" pro Track
 let scNative = !/[?&]widget\b/.test(location.search);   // ?widget = altes Widget erzwingen (zum Vergleich)
 let ytLoading = false, scLoading = false;   // Player-APIs erst bei Bedarf laden
 let curSource = "youtube", pending = null;
+/* YT-Native: Audio-Stream via /api/ytaudio → <audio>. Läuft im iOS-Hintergrund/Lock-Screen.
+   Falls der Stream nicht auflösbar ist (Piped down, Block), Fallback aufs IFrame.
+   Nutzt scAudio wenn SC gerade nicht läuft, sonst ytAudio (extra <audio>). */
+let ytAudio = null, ytPreload = null, ytStreamCache = new Map();
+const YT_STREAM_TTL = 4*60*1000;
+let curYtMode = null;   // "native" | "iframe"
+let ytNativeOn = true;  // User kann YT-Native ausschalten (?iframe oder Toggle)
 
 /* ====== PRO: Echter Overlap-Crossfade (Dual-Player) ======================
    Statt nur aus-/einzublenden (Fade), startet der nächste Track bereits, bevor
@@ -1668,6 +1703,13 @@ function buildPlayer(e){
 function playYT(e){
   if (scWidget){ try{ scWidget.pause(); }catch(_){} }
   if (scAudio){ try{ scAudio.pause(); }catch(_){} }
+  if (ytAudio){ try{ ytAudio.pause(); }catch(_){} }
+  // Native Audio-Stream bevorzugen (iOS-Hintergrund + Lock-Screen!)
+  if (ytNativeOn && e.t.kind !== "playlist" && /^[A-Za-z0-9_-]{11}$/.test(String(e.t.id))){
+    playYTNative(e); return;
+  }
+  // Fallback: IFrame (Videos, Playlists, oder wenn Native deaktiviert)
+  curYtMode = "iframe";
   if (!ytApiReady){ if(!ytLoading){ ytLoading=true; loadYTApi(); } pending = e; return; }
   if (!player){ buildPlayer(e); return; }
   if (!ytReady){ pending = e; return; }
@@ -1680,6 +1722,64 @@ function onState(ev){
   if (ev.data === YT.PlayerState.PLAYING){ isPlaying=true; reflectPlay(); startTicker(); }
   else if (ev.data === YT.PlayerState.PAUSED){ isPlaying=false; reflectPlay(); }
   else if (ev.data === YT.PlayerState.ENDED){ isPlaying=false; reflectPlay(); next(); }
+}
+
+/* ====== YT-NATIVE: Audio-Stream via /api/ytaudio → <audio> ======
+   Löst eine YT-Video-ID in eine direkte Audio-Stream-URL auf (via Piped-Proxy).
+   Spielt sie in einem nativen <audio>-Element ab — läuft im iOS-Hintergrund/Lock-Screen.
+   Fallback: wenn der Stream nicht auflösbar ist, fällt playYT() automatisch auf das
+   IFrame (buildPlayer) zurück. */
+async function resolveYTStream(id){
+  const c = ytStreamCache.get(id);
+  if (c && Date.now()-c.ts < YT_STREAM_TTL) return c;
+  const r = await fetch("/api/ytaudio?id=" + encodeURIComponent(id));
+  const j = await r.json().catch(()=>({}));
+  if (!r.ok || !j.url) throw new Error(j.error || ("HTTP "+r.status));
+  ytStreamCache.set(id, { url:j.url, mime:j.mime||"", dur:j.duration||0, ts:Date.now() });
+  return ytStreamCache.get(id);
+}
+function playYTNative(e){
+  curYtMode = "native";
+  // iOS: <audio> "freischalten" innerhalb der Nutzer-Geste (Track-Klick)
+  if (!ytAudio) ytAudio = $("#ytaudio");
+  if (scAudio && curScMode === "native"){ try{ scAudio.pause(); }catch(_){} }
+  if (scWidget){ try{ scWidget.pause(); }catch(_){} }
+  if (player && ytReady){ try{ player.pauseVideo(); }catch(_){} }
+  if (!ytAudio) return;
+  try{ ytAudio.src = SC_SILENT; ytAudio.play().catch(()=>{}); }catch(_){}
+  const myId = uid(e.t);
+  let url, usePreloaded = false;
+  resolveYTStream(e.t.id).then(res=>{
+    if (curId !== myId) return;  // Nutzer hat inzwischen umgeschaltet
+    if (ytPreload && preloadedUid === myId && ytPreload.src){
+      url = ytPreload.src; usePreloaded = true;
+    } else {
+      url = res.url;
+    }
+    if (usePreloaded){
+      const old = ytAudio; ytAudio = ytPreload; ytPreload = old; preloadedUid = null;
+      try{ ytPreload.pause(); ytPreload.removeAttribute("src"); ytPreload.load(); }catch(_){}
+    } else {
+      ytAudio.src = url;
+    }
+    ytAudio.preload = "auto";
+    // Duration überschreiben, falls Piped sie liefert
+    if (res.dur && res.dur > 0){
+      const g = ensureGenre(e.genre);
+      const t = g.tracks.find(x=>x.id===e.t.id);
+      if (t && !t.dur) t.dur = Math.round(res.dur/1000);
+    }
+    applyVolume();
+    ytAudio.play().then(()=>{
+      ytReady = true; isPlaying = true; reflectPlay(); startTicker(); prefetchNext();
+    }).catch(()=>{
+      // Native Playback fehlgeschlagen -> IFrame-Fallback
+      playYT(e);
+    });
+  }).catch(()=>{
+    // Stream nicht auflösbar -> IFrame-Fallback
+    playYT(e);
+  });
 }
 
 // SoundCloud: Widget-API
@@ -2032,8 +2132,14 @@ function startTicker(){
         scWidget.getPosition(p=>{ scPos=(p||0)/1000; scWidget.getDuration(d=>updateTime(scPos,(d||0)/1000)); });
       }
     } else {
-      if (!player || !player.getDuration) return;
-      updateTime(player.getCurrentTime()||0, player.getDuration()||0);
+      // YouTube: nativer <audio> hat Vorrang vor dem IFrame
+      if (curYtMode === "native" && ytAudio){
+        updateTime(ytAudio.currentTime || 0, ytAudio.duration || 0);
+        if ("mediaSession" in navigator && navigator.mediaSession.setPositionState && ytAudio.duration){
+          try{ navigator.mediaSession.setPositionState({ duration:ytAudio.duration, position:Math.min(ytAudio.currentTime,ytAudio.duration), playbackRate:1 }); }catch(_){}
+        }
+      } else if (!player || !player.getDuration) return;
+      else { updateTime(player.getCurrentTime()||0, player.getDuration()||0); }
     }
   }, 300);
 }
@@ -2167,15 +2273,21 @@ async function publish(){
   commitStageToLib();
   const pw = $("#pw").value;
   if (!pw){ setStat("#pub-stat","Passwort fehlt.","err"); return; }
-  setStat("#pub-stat","Veröffentliche…","work");
-  const payload = { password:pw, playlists:{ version:1, updated:new Date().toISOString(), genres:LIB.genres } };
+  setStat("#pub-stat","Veröffentliche (Split: Manifest + data/)…","work");
+  // Split-Modus: Server schreibt playlists.json (Manifest) + data/<slug>.json pro Genre.
+  // Entspricht tools/build.py. Legacy "full" wuerde den schnellen Initial-Load brechen.
+  const payload = { password:pw, mode:"split", playlists:{ version:2, updated:new Date().toISOString(), genres:LIB.genres } };
   try{
     const r = await fetch("/api/publish", {
       method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)
     });
     const j = await r.json().catch(()=>({}));
-    if (r.ok){ setStat("#pub-stat","✓ Live. Vercel deployt neu (~30 s).","ok"); }
+    if (r.ok){
+      const n = j.files || "?";
+      setStat("#pub-stat","✓ Live — "+n+" Datei(en): Manifest + data/. Vercel deployt neu (~30 s).","ok");
+    }
     else if (r.status===401){ setStat("#pub-stat","✗ Falsches Passwort.","err"); }
+    else if (r.status===429){ setStat("#pub-stat","✗ Zu viele Versuche — 15 Min warten.","err"); }
     else { setStat("#pub-stat","✗ "+(j.error||("HTTP "+r.status)),"err"); }
   }catch(e){
     setStat("#pub-stat","✗ Kein Backend erreichbar — nutze „Export JSON“ lokal.","err");
@@ -2228,6 +2340,7 @@ function bind(){
   // search
   let to;
   $("#search").addEventListener("input", ()=>{ clearTimeout(to); to=setTimeout(render,120); });
+  $("#btn-lang").onclick = toggleLang;
 
   // delegated: row = play, section head = auf-/zuklappen
   $("#index").addEventListener("click", e=>{
@@ -2380,6 +2493,7 @@ async function boot(){
   bind();
   applyProState();
   syncProBtns();
+  applyLang();
   render();
   routeHash();   // Player-APIs (YT/SC) werden erst beim ersten Play geladen → schnellerer Initial-Load
   // Support: nur beim allerersten Besuch dezent aufgehen — danach nur bei Nutzer-Trigger
