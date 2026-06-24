@@ -482,8 +482,23 @@ body.lang-en .player.is-empty::after{content:"// NO TRACK SELECTED — PICK ONE 
   .viz{display:none}
   #ytwrap.show{width:200px;height:113px}
 }
+/* ── Politur: feine Micro-Interactions (additiv, brutalist beibehalten) ── */
+html{scroll-behavior:smooth}
+.row{transition:background .14s ease}
+.row:hover .row__idx{color:var(--accent)}                 /* Track-Nr. leuchtet beim Hover */
+.pl__btn{transition:transform .09s ease, color .12s ease}
+.pl__btn:hover{color:var(--accent)}
+.pl__btn:active{transform:scale(.86)}                     /* taktiles Press-Feedback */
+.gnav a{transition:color .15s ease, background .15s ease}
+.gnav a:hover{background:rgba(255,255,255,.04)}
+.thm{transition:transform .12s ease, box-shadow .12s ease}
+.sleepb,.btn{transition:transform .09s ease, color .12s ease, background .12s ease, border-color .12s ease}
+.sleepb:active,.btn:active{transform:scale(.96)}
+.hero h1 .dot{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.hero:hover h1 .dot{transform:scale(1.18)}                /* dezenter Reiz am Akzent-Punkt */
+
 @media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
 </style>
 </head>
