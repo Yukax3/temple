@@ -1530,7 +1530,9 @@ let curSource = "youtube", pending = null;
 let ytAudio = null, ytPreload = null, ytStreamCache = new Map();
 const YT_STREAM_TTL = 4*60*1000;
 let curYtMode = null;   // "native" | "iframe"
-let ytNativeOn = true;  // User kann YT-Native ausschalten (?iframe oder Toggle)
+// DEFAULT: iframe (zuverlässig, spielt sofort). YT-Native (Piped-Hintergrund) ist FLAKY
+// (IP-gesperrte Stream-URLs können hängen) -> nur opt-in via ?ytnative=1.
+let ytNativeOn = /[?&]ytnative\b/.test(location.search);
 
 /* ====== PRO: Echter Overlap-Crossfade (Dual-Player) ======================
    Statt nur aus-/einzublenden (Fade), startet der nächste Track bereits, bevor
@@ -1764,6 +1766,8 @@ function playYTNative(e){
   try{ ytAudio.src = SC_SILENT; ytAudio.play().catch(()=>{}); }catch(_){}
   const myId = uid(e.t);
   let url, usePreloaded = false;
+  // Watchdog: spielt der Track nach 4.5s nicht -> hart aufs IFrame (kein ewiges Hängen bei Piped-Murks)
+  const ytWatch = setTimeout(()=>{ if (curId===myId && (!ytAudio || ytAudio.paused || (ytAudio.currentTime||0) < 0.1)) playYT(e); }, 4500);
   resolveYTStream(e.t.id).then(res=>{
     if (curId !== myId) return;  // Nutzer hat inzwischen umgeschaltet
     if (ytPreload && preloadedUid === myId && ytPreload.src){
@@ -1786,12 +1790,15 @@ function playYTNative(e){
     }
     applyVolume();
     ytAudio.play().then(()=>{
+      clearTimeout(ytWatch);
       ytReady = true; isPlaying = true; reflectPlay(); startTicker(); prefetchNext();
     }).catch(()=>{
+      clearTimeout(ytWatch);
       // Native Playback fehlgeschlagen -> IFrame-Fallback
       playYT(e);
     });
   }).catch(()=>{
+    clearTimeout(ytWatch);
     // Stream nicht auflösbar -> IFrame-Fallback
     playYT(e);
   });
