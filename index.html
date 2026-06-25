@@ -446,6 +446,17 @@ body.lang-en .player.is-empty::after{content:"// NO TRACK SELECTED — PICK ONE 
 .sleepb{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line-2);padding:9px 14px;transition:.12s}
 .sleepb:hover{color:var(--fg);border-color:var(--fg)}
 .sleepb.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
+/* Stats / Wrapped */
+.statbig{font-family:"Space Mono",monospace;font-size:13px;color:var(--muted);margin:2px 0 16px;line-height:1.7}
+.statbig b{color:var(--accent)}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:14px}
+@media(max-width:560px){.statgrid{grid-template-columns:1fr;gap:14px}}
+.statlab{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);margin-bottom:6px}
+.statrow{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.statrow__r{font-family:"Space Mono",monospace;color:var(--accent);font-size:12px;width:14px;flex:none}
+.statrow__n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.statrow__sub{color:var(--muted)}
+.statrow__c{font-family:"Space Mono",monospace;color:var(--muted);font-size:12px;flex:none}
 .is-pro .foot__pro::after{content:" ✓"}
 .badge-pro{display:none;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.14em;color:var(--accent-ink);background:var(--accent);padding:2px 6px;margin-left:8px;vertical-align:middle}
 .is-pro .badge-pro{display:inline-block}
@@ -708,10 +719,10 @@ https://www.youtube.com/playlist?list=…"></textarea>
     <div class="note" style="margin-top:4px">Kaufen, Key einlösen, fertig. Auf jedem Gerät.</div>
 
     <div class="btnrow" style="margin-top:16px">
-      <a class="btn btn--accent" id="pro-buy" href="#" target="_blank" rel="noopener">Mit Karte kaufen</a>
-      <a class="btn btn--ghost" id="pro-paypal" href="#" target="_blank" rel="noopener">Lieber per PayPal</a>
+      <a class="btn btn--accent" id="pro-paypal" href="#" target="_blank" rel="noopener">Mit PayPal · 3 €</a>
+      <a class="btn btn--ghost" id="pro-buy" href="#" target="_blank" rel="noopener" style="display:none">Karte</a>
     </div>
-    <div class="note">Nach dem Kauf bekommst du einen <b>Lizenz-Key</b> (Karte: sofort; PayPal: per Mail). Hier unten eintragen.</div>
+    <div class="note"><b>So geht's:</b> PayPal-Zahlung (3 €) → du bekommst deinen <b>Freischalt-Key per Mail</b> an deine PayPal-Adresse → unten eintragen. Owner-Key? Auch hier rein.</div>
 
     <div class="pro__or">— Key einlösen —</div>
     <div class="fld">
@@ -733,6 +744,10 @@ https://www.youtube.com/playlist?list=…"></textarea>
       <h2>PRO <b>·</b> EINSTELLUNGEN</h2>
       <button class="admin__close" id="close-panel">Schliessen [ESC]</button>
     </div>
+
+    <div class="admin__sub">Dein Tempel · Wrapped</div>
+    <div id="panel-stats"></div>
+    <div class="btnrow" style="margin-bottom:6px"><button class="btn btn--ghost" id="clear-stats" style="font-size:11px;padding:8px 12px">Stats zurücksetzen</button></div>
 
     <div class="admin__sub">Akzentfarbe</div>
     <div class="thmrow" id="panel-themes"></div>
@@ -853,8 +868,8 @@ function toggleLang(){ LANG = (LANG==="de") ? "en" : "de"; try{ localStorage.set
    Bezahl-Links hier eintragen, sobald das Lemon-Squeezy-Produkt + PayPal stehen.
    Lizenz-Check läuft serverseitig über /api/license (validiert LS-Key). */
 const PRO = {
-  buyUrl:    "",   // z.B. "https://DEINSTORE.lemonsqueezy.com/buy/XXXXXXXX"  (One-time-Produkt mit License Keys)
-  paypalUrl: "",   // z.B. "https://paypal.me/DEINNAME/3"
+  buyUrl:    "",   // (Lemon/Stripe deaktiviert — wir nutzen PayPal)
+  paypalUrl: "https://paypal.me/t3mpl3music/3",   // 3 € · Key kommt per Mail an die PayPal-Adresse
 };
 const PRO_LS = "temple_pro";
 function isPro(){ try{ return !!localStorage.getItem(PRO_LS); }catch(_){ return false; } }
@@ -911,6 +926,20 @@ function sleepLeft(){ return sleepEnd ? Math.max(0, Math.round((sleepEnd-Date.no
 function openPanel(){ document.getElementById("propanel").classList.add("open"); renderPanel(); }
 function closePanel(){ document.getElementById("propanel").classList.remove("open"); }
 function renderPanel(){
+  const ps = document.getElementById("panel-stats");
+  if (ps){
+    const st = computeStats();
+    if (!st.plays){
+      ps.innerHTML = `<div class="empty" style="padding:14px 0">// noch keine Plays — leg los, dann füllt sich dein Wrapped</div>`;
+    } else {
+      const since = st.since ? new Date(st.since).toLocaleDateString("de-DE",{day:"2-digit",month:"short",year:"numeric"}) : "";
+      const dur = st.estHours<1 ? Math.round(st.estHours*60)+" min" : st.estHours.toFixed(1)+" h";
+      const genres = st.topGenres.map(([g,c],i)=>`<div class="statrow"><span class="statrow__r">${i+1}</span><span class="statrow__n">${esc(g)}</span><span class="statrow__c">${c}×</span></div>`).join("") || "—";
+      const tracks = st.topTracks.map((x,i)=>`<div class="statrow"><span class="statrow__r">${i+1}</span><span class="statrow__n">${esc(x.t.title||x.t.id)}<span class="statrow__sub"> · ${esc(x.t.artist||"—")}</span></span><span class="statrow__c">${x.c}×</span></div>`).join("") || "—";
+      ps.innerHTML = `<div class="statbig"><b>${st.plays}</b> Plays · <b>~${dur}</b> · ${st.genreCount} Genres${since?` · seit ${esc(since)}`:""}</div>
+        <div class="statgrid"><div><div class="statlab">Top-Genres</div>${genres}</div><div><div class="statlab">Meistgespielt</div>${tracks}</div></div>`;
+    }
+  }
   const cur = (isPro() && curTheme()) || THEMES[0];
   const th = document.getElementById("panel-themes");
   if (th) th.innerHTML = THEMES.map((t,i)=>`<button class="thm${t[0]===cur[0]?' on':''}" data-thm="${i}" title="${esc(t[0])}" aria-label="${esc(t[0])}" style="background:${t[1]}"></button>`).join("");
@@ -1033,6 +1062,28 @@ function historyIds(){ return idsLS("temple_history"); }
 function historyTracks(){ return historyIds().map(trackByUid).filter(Boolean); }
 function addHistory(u){ if(!u) return; const ids=historyIds().filter(x=>x!==u); ids.unshift(u); setIdsLS("temple_history", ids.slice(0,80)); }
 function removeHistory(u){ setIdsLS("temple_history", historyIds().filter(x=>x!==u)); renderPanel(); }
+
+/* ---------- PRO-FEATURE: Hör-Stats / TEMPLE Wrapped ---------- */
+function loadStats(){ try{ return JSON.parse(localStorage.getItem("temple_stats")||"null") || {plays:0,byGenre:{},byTrack:{},first:Date.now()}; }catch(_){ return {plays:0,byGenre:{},byTrack:{},first:Date.now()}; } }
+function saveStats(s){ try{ localStorage.setItem("temple_stats", JSON.stringify(s)); }catch(_){} }
+function logPlay(e){
+  if (!e || !e.t) return;
+  const s = loadStats();
+  s.plays = (s.plays||0) + 1;
+  if (!s.first) s.first = Date.now();
+  const g = e.genre || "—"; s.byGenre[g] = (s.byGenre[g]||0) + 1;
+  const u = uid(e.t); s.byTrack[u] = (s.byTrack[u]||0) + 1;
+  saveStats(s);
+}
+function computeStats(){
+  const s = loadStats();
+  const topGenres = Object.entries(s.byGenre||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topTracks = Object.entries(s.byTrack||{}).sort((a,b)=>b[1]-a[1]).slice(0,5)
+    .map(([u,c])=>({ t:trackByUid(u), c })).filter(x=>x.t);
+  let secs=0; for (const [u,c] of Object.entries(s.byTrack||{})){ const t=trackByUid(u); secs += ((t&&t.dur) ? t.dur : 300)*c; }   // bekannte Dauer, sonst ~5 Min/Track
+  return { plays:s.plays||0, topGenres, topTracks, estHours: secs/3600, since:s.first, genreCount:Object.keys(s.byGenre||{}).length };
+}
+function clearStats(){ try{ localStorage.removeItem("temple_stats"); }catch(_){} renderPanel(); }
 async function redeemLicense(){
   const inp = document.getElementById("pro-key");
   const key = (inp.value||"").trim();
@@ -1689,6 +1740,7 @@ function startPlay(e, noOpen){
   }
   if (curId && curId !== nextId) addHistory(curId);
   curId = nextId;
+  logPlay(e);   // PRO-Stats: Play zählen (Genre, Track, gesamt)
   fadeMul = fadeOn ? 0 : 1;   // neuer Track blendet sanft ein
   if (e.genre && !noOpen) openGenres.add(e.genre);   // Randomizer öffnet die Sektion NICHT
   curSource = e.t.source || "youtube";
@@ -2492,6 +2544,7 @@ function bind(){
   $("#play-queue").onclick = ()=>{ const qid=shiftQueue(); const t=qid&&trackByUid(qid); if(t){ closePanel(); startPlay({t,genre:"Queue"}, true); renderPanel(); } };
   $("#clear-queue").onclick = ()=>{ setIdsLS("temple_queue", []); renderPanel(); render(); };
   $("#clear-history").onclick = ()=>{ setIdsLS("temple_history", []); renderPanel(); };
+  $("#clear-stats").onclick = clearStats;
   $("#panel-themes").addEventListener("click", e=>{ const b=e.target.closest("[data-thm]"); if(b) setTheme(+b.dataset.thm); });
   $("#panel-sleep").addEventListener("click", e=>{ const b=e.target.closest("[data-sleep]"); if(b) setSleep(+b.dataset.sleep); });
   $("#panel-speed").addEventListener("click", e=>{ const b=e.target.closest("[data-speed]"); if(b) setSpeed(parseFloat(b.dataset.speed)); });

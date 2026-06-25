@@ -9,7 +9,7 @@
 // eigentlichen SC-Audio-Segmente (fremde CDN-Origin, ToS-relevant). Die Track-
 // LISTE ist aber komplett offline verfügbar — die "Bibliothek" ist auch ohne
 // Netz da; nur die Wiedergabe braucht dann Online.
-const CACHE = "temple-v5";   // bei jedem Shell/Daten-Update hochzählen -> Nutzer kriegen die neue Version
+const CACHE = "temple-v7";   // bei jedem Shell/Daten-Update hochzählen -> Nutzer kriegen die neue Version
 const SHELL = ["/", "/index.html", "/favicon.svg", "/manifest.webmanifest", "/playlists.json", "/og.svg"];
 
 self.addEventListener("install", e => {
