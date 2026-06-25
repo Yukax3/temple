@@ -1,0 +1,110 @@
+// Vercel Serverless Function — GET /api/ytaudio?id=<youtube_video_id>
+// Löst eine YouTube-Video-ID in eine direkte, im <audio> abspielbare Audio-Stream-URL auf.
+//
+// Wozu: YouTube-Iframes pausieren auf iOS, sobald der Browser in den Hintergrund geht.
+// Ein NATIVES <audio>-Element mit einer direkten Stream-URL läuft dagegen im Hintergrund
+// + Lock-Screen weiter (mit MediaSession). Genau wie /api/stream für SoundCloud.
+//
+// Quelle: Piped API (offener YouTube-Proxy, keine Keys nötig).
+// Fallback: pipedapi.kavin.rocks → pipedapi.adminforge.de → pipedapi.in.projectsegfau.lt
+//
+// Ehrlich: Piped ist ein Drittanbieter-Dienst. Wenn er down ist oder YT blockiert,
+// fällt der Endpoint zurück aufs IFrame (Frontend-Handling). Alternativ: yt-dlp
+// auf einem eigenen Server ( nicht Vercel-freundlich).
+//
+// Audio-Codec-Priorität (für iOS optimiert — das ist der ganze Zweck):
+//   1. mp4/aac (m4a) — iOS Safari spielt das ZUVERLÄSSIG (auch im Hintergrund)
+//   2. opus (webm) — Desktop/Android super, aber iOS Safari spielt es oft NICHT
+//   3. beliebiger audio-Stream — besser als gar nichts
+// (m4a zuerst, weil Hintergrund-Audio v.a. auf iOS gebraucht wird; opus würde dort
+//  scheitern und unnötig aufs IFrame zurückfallen.)
+
+const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36";
+
+// Piped-Instanzen (in Reihenfolge versuchen)
+const PIPED = [
+  "https://pipedapi.kavin.rocks",
+  "https://pipedapi.adminforge.de",
+  "https://pipedapi.in.projectsegfau.lt",
+];
+
+// Cache: videoId -> { url, mime, ts }
+const cache = new Map();
+const TTL = 4 * 60 * 1000;  // 4 Min ( YT-Stream-URLs sind kurzlebig)
+
+async function fetchPiped(videoId) {
+  for (const base of PIPED) {
+    try {
+      const r = await fetch(`${base}/streams/${encodeURIComponent(videoId)}`, {
+        headers: { "User-Agent": UA },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!r.ok) continue;
+      const j = await r.json();
+      if (!j || !j.audioStreams) continue;
+
+      // m4a/aac ZUERST (iOS-sicher), dann opus, innerhalb gleicher Familie höchste Bitrate.
+      const score = s => {
+        const m = (s.mimeType || "").toLowerCase();
+        let base = 0;
+        if (m.includes("mp4") || m.includes("m4a") || m.includes("aac")) base = 200;  // iOS Safari ✓
+        else if (m.includes("opus")) base = 100;                                       // iOS spotty
+        return base + Math.min((s.bitrate || 0) / 1000, 99);   // + Bitrate (gedeckelt, damit Codec gewinnt)
+      };
+      const streams = j.audioStreams
+        .filter(s => s.url && s.mimeType && s.bitrate)
+        .sort((a, b) => score(b) - score(a));
+
+      if (streams.length) {
+        const pick = streams[0];
+        return {
+          url: pick.url,
+          mime: pick.mimeType,
+          bitrate: pick.bitrate,
+          title: j.title || "",
+          duration: (j.duration || 0) * 1000,  // Piped liefert Sekunden
+        };
+      }
+    } catch (_) {
+      // Diese Instanz gescheitert -> nächste
+    }
+  }
+  return null;
+}
+
+export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const id = (req.query.id || "").toString().trim();
+  if (!/^[A-Za-z0-9_-]{11}$/.test(id)) {
+    return res.status(400).json({ error: "Parameter 'id' (11-Zeichen YouTube-Video-ID) fehlt" });
+  }
+
+  try {
+    // Cache prüfen
+    const cached = cache.get(id);
+    if (cached && Date.now() - cached.ts < TTL) {
+      return res.status(200).json({ url: cached.url, mime: cached.mime, title: cached.title, duration: cached.duration });
+    }
+
+    const result = await fetchPiped(id);
+    if (!result) {
+      return res.status(502).json({
+        error: "Kein Audio-Stream gefunden (Piped nicht erreichbar oder Block)",
+        hint: "Frontend sollte auf IFrame-Fallback zurückfallen.",
+      });
+    }
+
+    // Cachen
+    cache.set(id, { url: result.url, mime: result.mime, title: result.title, duration: result.duration, ts: Date.now() });
+
+    res.setHeader("Cache-Control", "public, max-age=240");
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(500).json({ error: String((e && e.message) || e) });
+  }
+}

@@ -508,6 +508,33 @@ html{scroll-behavior:smooth}
 .hero h1 .dot{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
 .hero:hover h1 .dot{transform:scale(1.18)}                /* dezenter Reiz am Akzent-Punkt */
 
+/* ═══════════ DESIGN-PASS (brutalist erhalten, nur verfeinert) ═══════════ */
+/* 1. Kontrast: --muted-2 #4a4a4a war ~2.9:1 auf Schwarz (zu dunkel zum Lesen) -> ~3.7:1 */
+:root{ --muted-2:#5e5e5e; }
+
+/* 2. Brutalist-Scrollbar statt Browser-Default (passt zum schwarzen Raster) */
+*{scrollbar-width:thin;scrollbar-color:#2a2a2a #000}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:#2a2a2a}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* 3. Such-Bar: Fokus zieht auf den Akzent (statt nur Weiß) — klarere Affordance */
+.search:focus-within{border-color:var(--accent)}
+.search:focus-within svg{color:var(--accent)}
+
+/* 4. Genre-Anker: angesteuerte Sektion hebt sich im Titel ab */
+.section:target>.section__head h2{color:var(--accent)}
+
+/* 5. Zahlen tabellarisch ausrichten (Counts/Zeit zappeln nicht) */
+.section__count,.hero__meta,.pl__time,.gnav a .c{font-variant-numeric:tabular-nums}
+
+/* 6. Tastatur-Fokus auf Track-Zeilen sichtbar (a11y) */
+.row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* 7. Laufender Titel kriegt volle Präsenz */
+#player.playing #pl-title{color:var(--fg)}
+
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
@@ -764,6 +791,13 @@ https://www.youtube.com/playlist?list=…"></textarea>
     </div>
     <div class="note">Tonhöhe bleibt erhalten. Gilt für YouTube &amp; SoundCloud.</div>
 
+    <div class="admin__sub">YouTube-Hintergrund <span class="protag">BETA</span></div>
+    <div class="sleeprow" id="panel-ytnative">
+      <button class="sleepb" data-ytn="0">Aus</button>
+      <button class="sleepb" data-ytn="1">An</button>
+    </div>
+    <div class="note">An: YouTube-Tracks laufen als nativer Audio-Stream (Hintergrund + Lock-Screen, wie SoundCloud). Über Piped — kann mal wackeln, fällt dann automatisch aufs normale Video zurück. Aus = immer das stabile Video.</div>
+
     <div class="admin__sub">Overlap-Crossfade <span class="protag">PRO</span></div>
     <div class="sleeprow" id="panel-xfade">
       <button class="sleepb" data-xfade="0">Aus</button>
@@ -947,6 +981,7 @@ function renderPanel(){
   const st = document.getElementById("sleep-stat");
   if (st){ const l=sleepLeft(); st.textContent = sleepMin ? ("läuft — noch ~"+l+" Min") : "aus"; }
   document.querySelectorAll("#panel-speed [data-speed]").forEach(b=> b.classList.toggle("on", parseFloat(b.dataset.speed) === playbackSpeed));
+  document.querySelectorAll("#panel-ytnative [data-ytn]").forEach(b=> b.classList.toggle("on", (b.dataset.ytn==="1") === !!ytNativeOn));
   document.querySelectorAll("#panel-xfade [data-xfade]").forEach(b=> b.classList.toggle("on", +b.dataset.xfade === xfadeDur));
   const xs = document.getElementById("xfade-stat"); if (xs) xs.textContent = xfadeDur ? (xfadeDur + "s Überblendung") : "aus";
   const abs = document.getElementById("ab-stat"); if (abs) abs.textContent = abOn ? ("A "+fmt(abStart)+" → B "+fmt(abEnd)) : "aus";
@@ -1582,8 +1617,14 @@ let ytAudio = null, ytPreload = null, ytStreamCache = new Map();
 const YT_STREAM_TTL = 4*60*1000;
 let curYtMode = null;   // "native" | "iframe"
 // DEFAULT: iframe (zuverlässig, spielt sofort). YT-Native (Piped-Hintergrund) ist FLAKY
-// (IP-gesperrte Stream-URLs können hängen) -> nur opt-in via ?ytnative=1.
-let ytNativeOn = /[?&]ytnative\b/.test(location.search);
+// (IP-gesperrte Stream-URLs können hängen) -> opt-in via Pro-Toggle oder ?ytnative=1.
+let ytNativeOn = /[?&]ytnative\b/.test(location.search) || (()=>{ try{ return localStorage.getItem("temple_ytnative")==="1"; }catch(_){ return false; } })();
+function setYtNative(on){
+  if (!isPro()){ openBuy(); return; }   // Pro-Feature (Beta)
+  ytNativeOn = !!on;
+  try{ localStorage.setItem("temple_ytnative", on ? "1":"0"); }catch(_){}
+  renderPanel();
+}
 
 /* ====== PRO: Echter Overlap-Crossfade (Dual-Player) ======================
    Statt nur aus-/einzublenden (Fade), startet der nächste Track bereits, bevor
@@ -1895,6 +1936,13 @@ function prefetchNext(){
       scPreload.preload = "auto"; scPreload.src = url; preloadedUid = u;
       try{ scPreload.load(); }catch(_){}
     }).catch(()=>{});
+  } else if (nx.t.source !== "soundcloud" && ytNativeOn && /^[A-Za-z0-9_-]{11}$/.test(String(nx.t.id))){
+    resolveYTStream(nx.t.id).then(res=>{
+      if (!ytPreload) ytPreload = $("#ytpreload");
+      if (!ytPreload || preloadedUid === u) return;
+      ytPreload.preload = "auto"; ytPreload.src = res.url; preloadedUid = u;
+      try{ ytPreload.load(); }catch(_){}
+    }).catch(()=>{});
   }
 }
 
@@ -1939,6 +1987,8 @@ function getPosDur(){
     if (curScMode === "native") return [scAudio?scAudio.currentTime:0, scAudio?scAudio.duration:0];
     return [scPos, 0];
   }
+  // YouTube: nativer <audio> hat Vorrang
+  if (curYtMode === "native" && ytAudio) return [ytAudio.currentTime||0, ytAudio.duration||0];
   if (player && ytReady) return [player.getCurrentTime()||0, player.getDuration()||0];
   return [0,0];
 }
@@ -2005,7 +2055,6 @@ function xfadeGuard(){
 // Overlap starten: nächsten Track leise in der 2. Hälfte vorladen+spielen.
 function startCrossfade(nx){
   xfadeActive = true; xfadeState = { fromUid: curId, toEntry: nx, t0: Date.now() };
-  const targetVol = (muted ? 0 : volume);
   if (nx.t.source === "soundcloud" && /^\d+$/.test(String(nx.t.id))){
     // SC-nativ: scPreload ist schon der "zweite" Spieler
     resolveStream(nx.t.id).then(url=>{
@@ -2015,8 +2064,17 @@ function startCrossfade(nx){
       scPreload.play().catch(()=>{});
       pumpCrossfade();
     }).catch(()=>{ cancelXfade(); });
+  } else if (nx.t.source !== "soundcloud" && ytNativeOn && /^[A-Za-z0-9_-]{11}$/.test(String(nx.t.id))){
+    // YT-Native: ytpreload als zweite Hälfte (wie SC-nativ, sauberer Überblende-Pfad)
+    resolveYTStream(nx.t.id).then(res=>{
+      if (!xfadeState || xfadeState.toEntry !== nx) return;
+      if (!ytPreload) ytPreload = $("#ytpreload");
+      ytPreload.src = res.url; ytPreload.volume = 0;
+      ytPreload.play().catch(()=>{});
+      pumpCrossfade();
+    }).catch(()=>{ cancelXfade(); });
   } else if (nx.t.source !== "soundcloud"){
-    // YT: zweiten Player bauen (lazy), Video laden, leise starten
+    // YT-IFrame: zweiten Player bauen (lazy), Video laden, leise starten
     ensurePlayer2(()=>{
       if (!xfadeState || xfadeState.toEntry !== nx) return;
       try{ player2.loadVideoById(nx.t.id); player2.unMute(); player2.setVolume(0); player2.playVideo(); }catch(_){}
@@ -2111,6 +2169,10 @@ function togglePlay(){
   if (curSource === "soundcloud"){
     if (curScMode === "native"){ if(!scAudio) return; if(scAudio.paused) scAudio.play().catch(()=>{}); else scAudio.pause(); return; }
     if(!scWidget) return; if(isPlaying) scWidget.pause(); else scWidget.play(); return;
+  }
+  // YouTube: nativer <audio> hat Vorrang vor dem IFrame
+  if (curYtMode === "native" && ytAudio){
+    if(ytAudio.paused) ytAudio.play().catch(()=>{}); else ytAudio.pause(); return;
   }
   if (!player || !ytReady) return;
   const st = player.getPlayerState();
@@ -2380,6 +2442,7 @@ function applyVolume(){
   }
   if (scWidget){ try{ scWidget.setVolume(eff); }catch(_){} }
   if (scAudio){ try{ scAudio.volume = Math.max(0, Math.min(1, eff/100)); }catch(_){} }
+  if (ytAudio){ try{ ytAudio.volume = Math.max(0, Math.min(1, eff/100)); }catch(_){} }
   const shown = (muted || volume===0);   // UI zeigt die EINGESTELLTE Lautstärke, nicht den Fade
   $("#vol-fill").style.width = (shown?0:volume) + "%";
   $("#ic-vol").style.display = shown ? "none":"block";
@@ -2548,6 +2611,7 @@ function bind(){
   $("#panel-themes").addEventListener("click", e=>{ const b=e.target.closest("[data-thm]"); if(b) setTheme(+b.dataset.thm); });
   $("#panel-sleep").addEventListener("click", e=>{ const b=e.target.closest("[data-sleep]"); if(b) setSleep(+b.dataset.sleep); });
   $("#panel-speed").addEventListener("click", e=>{ const b=e.target.closest("[data-speed]"); if(b) setSpeed(parseFloat(b.dataset.speed)); });
+  $("#panel-ytnative").addEventListener("click", e=>{ const b=e.target.closest("[data-ytn]"); if(b) setYtNative(b.dataset.ytn==="1"); });
   $("#panel-xfade").addEventListener("click", e=>{ const b=e.target.closest("[data-xfade]"); if(b) setXfade(+b.dataset.xfade); });
   $("#btn-abset-a").onclick = ()=>{ if(!isPro()){openBuy();return;} setAB("a"); renderPanel(); };
   $("#btn-abset-b").onclick = ()=>{ if(!isPro()){openBuy();return;} setAB("b"); renderPanel(); };
